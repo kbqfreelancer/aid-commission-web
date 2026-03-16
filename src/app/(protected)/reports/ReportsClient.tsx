@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Search, Filter, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Plus, ChevronLeft, ChevronRight, FileText, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHeader } from '@/components/layout/HeaderContext';
+import { HEADER_PRIMARY_CLASS } from '@/components/layout/headerStyles';
 import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
@@ -71,7 +72,7 @@ export function ReportsClient({
       title: 'Reports',
       description: 'Manage and track HR indicator report submissions',
       actions: (
-        <Button size="sm" asChild className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
+        <Button size="sm" asChild className={HEADER_PRIMARY_CLASS}>
           <Link href="/reports/new">
             <Plus size={14} /> New Report
           </Link>
@@ -89,13 +90,23 @@ export function ReportsClient({
         className="flex flex-wrap items-center gap-2 mb-5 p-3 bg-card border border-border rounded-lg"
       >
         <div className="relative flex-1 min-w-40">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search organisation…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs"
+            className="h-9 rounded-lg border-slate-200 bg-white pl-8 pr-8 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm focus:border-amber-400 focus:ring-2 focus:ring-amber-100 dark:border-border dark:bg-background dark:text-foreground"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded text-slate-400 hover:text-slate-600 dark:hover:text-foreground"
+              aria-label="Clear search"
+            >
+              <X size={13} />
+            </button>
+          )}
         </div>
 
         {serverUser?.role !== 'data_entry' && (
@@ -187,7 +198,7 @@ export function ReportsClient({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg"
+        className="rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg dark:border-border dark:bg-card"
       >
         <div className="px-6 pt-6 pb-3">
           <div className="flex items-center justify-between">
@@ -196,8 +207,8 @@ export function ReportsClient({
               {meta ? `${(page - 1) * 20 + 1}–${Math.min(page * 20, meta.total)} of ${meta.total}` : '—'}
             </p>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
-            HR indicator report submissions asdfasdfds
+          <p className="text-sm text-gray-600 mt-1 dark:text-muted-foreground">
+            HR indicator report submissions
           </p>
         </div>
         <div className="overflow-x-auto">
@@ -224,10 +235,16 @@ export function ReportsClient({
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
-                    <p className="text-sm text-gray-500 font-medium">No reports found</p>
-                    <Button variant="outline" size="sm" className="mt-4 rounded-lg" asChild>
-                      <Link href="/reports/new">Create first report</Link>
-                    </Button>
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-amber-50 flex items-center justify-center dark:bg-amber-500/10">
+                        <FileText size={20} className="text-amber-500 dark:text-amber-400" />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-700 dark:text-foreground">No reports found</p>
+                      <p className="text-xs text-gray-500 dark:text-muted-foreground">Try adjusting your filters or create a new report</p>
+                      <Button variant="outline" size="sm" className="mt-1 rounded-lg" asChild>
+                        <Link href="/reports/new">Create first report</Link>
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ) : (

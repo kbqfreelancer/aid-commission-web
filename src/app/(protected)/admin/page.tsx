@@ -7,14 +7,14 @@ import { Skeleton } from '@/components/ui/index';
 function AdminSkeleton() {
   return (
     <PageSkeleton>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[0, 60, 120, 180].map((delay, i) => (
-          <SkeletonCard key={i} delay={delay} className="h-32" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-[120px]">
+        {[0, 50, 100, 150].map((delay, i) => (
+          <SkeletonCard key={i} delay={delay} className="h-full min-h-[120px]" />
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <Skeleton delay={240} rounded="xl" className="h-48 border border-border/50" />
-        <Skeleton delay={300} rounded="xl" className="h-48 border border-border/50" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Skeleton delay={200} rounded="xl" className="h-48 border border-border/50" />
+        <Skeleton delay={250} rounded="xl" className="h-48 border border-border/50" />
       </div>
     </PageSkeleton>
   );

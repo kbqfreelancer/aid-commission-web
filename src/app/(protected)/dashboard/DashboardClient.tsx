@@ -2,12 +2,14 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Users, FileText, Building2, TrendingUp, Activity, AlertCircle } from 'lucide-react';
+import { Users, FileText, Building2, TrendingUp, Activity, AlertCircle, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useHeader } from '@/components/layout/HeaderContext';
 import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { KpiCard } from '@/components/ui/KpiCard';
+import { HEADER_PRIMARY_CLASS } from '@/components/layout/headerStyles';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
 import { OrgComparisonChart } from '@/components/charts/OrgComparisonChart';
 import { sumNested } from '@/lib/utils';
@@ -15,57 +17,6 @@ import type { HrReport, NationalSummary, OrgSummaryRow, IndicatorDefinition } fr
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i);
-
-const KPI_ACCENTS = {
-  primary: { bg: 'bg-emerald-500/10', icon: 'text-emerald-600', border: 'border-l-emerald-500' },
-  gold: { bg: 'bg-amber-500/10', icon: 'text-amber-600', border: 'border-l-amber-500' },
-  blue: { bg: 'bg-sky-500/10', icon: 'text-sky-600', border: 'border-l-sky-500' },
-  violet: { bg: 'bg-violet-500/10', icon: 'text-violet-600', border: 'border-l-violet-500' },
-} as const;
-
-function KpiCard({
-  label,
-  value,
-  icon: Icon,
-  sub,
-  delay = 0,
-  accentKey = 'primary',
-}: {
-  label: string;
-  value: string | number;
-  icon: React.ElementType;
-  sub?: string;
-  delay?: number;
-  accentKey?: keyof typeof KPI_ACCENTS;
-}) {
-  const a = KPI_ACCENTS[accentKey];
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="h-full group"
-    >
-      <div className={`h-full relative overflow-hidden rounded-2xl border-l-4 ${a.border} bg-white border border-gray-200 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5`}>
-        <div className="absolute inset-0 bg-linear-to-br from-white/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="relative p-5 flex flex-col h-full">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-2">{label}</p>
-              <p className="font-display text-3xl font-bold tabular-nums text-gray-900 tracking-tight">
-                {typeof value === 'number' ? value.toLocaleString() : value}
-              </p>
-              {sub && <p className="text-xs text-gray-500 mt-2 font-medium truncate">{sub}</p>}
-            </div>
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${a.bg} ${a.icon} transition-transform duration-300 group-hover:scale-110`}>
-              <Icon size={20} strokeWidth={2} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 function StatusBreakdown({ reports }: { reports: HrReport[] }) {
   const counts = { draft: 0, submitted: 0, verified: 0, rejected: 0 };
@@ -139,60 +90,77 @@ export function DashboardClient({
     router.push(`/dashboard?${params.toString()}`);
   };
 
+  const hasFilters = year !== new Date().getFullYear() || !!quarter;
+
   useEffect(() => {
     if (!serverUser) return;
     setHeader({
       title: 'Dashboard',
-      description: `Welcome back, ${serverUser.name} · ${new Date().toLocaleDateString('en-GB', {
+      description: `Welcome back, ${serverUser.name}. Overview of verified HR indicator data across organisations · ${new Date().toLocaleDateString('en-GB', {
         weekday: 'long',
-        year: 'numeric',
         month: 'long',
         day: 'numeric',
       })}`,
       actions: (
-        <div className="flex items-center gap-2 flex-wrap">
-          <Select
-            value={year.toString()}
-            onValueChange={(v) => setFilters(Number(v), quarter)}
-          >
-            <SelectTrigger className="w-24 h-9 text-xs bg-gray-50 border-gray-300 text-gray-900 rounded-lg">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {YEARS.map((y) => (
-                <SelectItem key={y} value={y.toString()}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={quarter || '__all__'}
-            onValueChange={(v) => setFilters(year, v === '__all__' ? '' : v)}
-          >
-            <SelectTrigger className="w-28 h-9 text-xs bg-gray-50 border-gray-300 text-gray-900 rounded-lg">
-              <SelectValue placeholder="All quarters" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">All quarters</SelectItem>
-              {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
-                <SelectItem key={q} value={q}>
-                  {q}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button size="sm" asChild className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
-            <Link href="/reports/new">+ New Report</Link>
-          </Button>
-        </div>
+        <Button size="sm" asChild className={HEADER_PRIMARY_CLASS}>
+          <Link href="/reports/new">+ New Report</Link>
+        </Button>
       ),
     });
     return clearHeader;
-  }, [setHeader, clearHeader, serverUser, year, quarter]);
+  }, [setHeader, clearHeader, serverUser]);
 
   return (
     <>
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-wrap items-center gap-2 mb-5 p-3 bg-card border border-border rounded-lg"
+      >
+        <span className="text-xs font-medium text-muted-foreground shrink-0">Period:</span>
+        <Select
+          value={year.toString()}
+          onValueChange={(v) => setFilters(Number(v), quarter)}
+        >
+          <SelectTrigger className="w-24 h-9 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {YEARS.map((y) => (
+              <SelectItem key={y} value={y.toString()}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={quarter || '__all__'}
+          onValueChange={(v) => setFilters(year, v === '__all__' ? '' : v)}
+        >
+          <SelectTrigger className="w-28 h-9 text-xs">
+            <SelectValue placeholder="All quarters" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All quarters</SelectItem>
+            {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
+              <SelectItem key={q} value={q}>
+                {q}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {hasFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/dashboard')}
+            className="text-xs h-9 text-muted-foreground"
+          >
+            <Filter size={12} /> Clear
+          </Button>
+        )}
+      </motion.div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-[150px]">
         <KpiCard
           label="People Reached"
@@ -235,7 +203,7 @@ export function DashboardClient({
           transition={{ delay: 0.2, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="lg:col-span-2"
         >
-          <div className="h-full rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+          <div className="h-full rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
             <CardHeader className="pb-2 pt-6 px-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-bold text-gray-900">Reach by Organisation</CardTitle>
@@ -268,7 +236,7 @@ export function DashboardClient({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          <div className="h-full rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+          <div className="h-full rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
             <CardHeader className="pb-2 pt-6 px-6">
               <CardTitle className="text-lg font-bold text-gray-900">Report Status</CardTitle>
               <p className="text-sm text-gray-600 mt-1">
@@ -287,7 +255,7 @@ export function DashboardClient({
           transition={{ delay: 0.3, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="lg:col-span-3"
         >
-          <div className="rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
             <CardHeader className="pb-3 pt-6 px-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-bold text-gray-900">Indicator Registry</CardTitle>

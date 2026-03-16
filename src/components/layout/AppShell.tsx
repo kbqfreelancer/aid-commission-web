@@ -48,24 +48,24 @@ function AppShellInner({ children, title: titleProp, description: descProp, acti
       <Sidebar />
       <main className={cn('flex-1 min-h-screen flex flex-col transition-[margin] duration-200 ease-out', collapsed ? 'ml-16' : 'ml-60')}>
         {(title || actions) && (
-          <header className={cn('sticky top-0 z-20 border-b border-gray-200 bg-white shadow-sm px-8 py-4 [&_h1]:text-gray-900 [&_p]:text-gray-700', headerClassName)}>
-            <div className="flex items-start justify-between gap-6">
+          <header className={cn('sticky top-0 z-20 border-b-2 border-slate-300 bg-white shadow-md px-8 py-4 [&_h1]:text-slate-900 [&_p]:text-slate-600', headerClassName)}>
+            <div className="flex items-center justify-between gap-6">
               <div className="min-w-0 flex-1">
                 {title && (
                   <motion.h1
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="font-display text-xl text-gray-900"
+                    className="font-display text-xl font-semibold text-slate-900"
                   >
                     {title}
                   </motion.h1>
                 )}
                 {description && (
-                  <p className="text-sm text-gray-600 mt-0.5">{description}</p>
+                  <p className="text-sm text-slate-700 mt-0.5">{description}</p>
                 )}
               </div>
               {actions && (
-                <div className="flex items-center gap-2 shrink-0 rounded-xl bg-gray-100 border border-gray-200 px-3 py-2">
+                <div className="flex items-center gap-2 shrink-0">
                   {actions}
                 </div>
               )}

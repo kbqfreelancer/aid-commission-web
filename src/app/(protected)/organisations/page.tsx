@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/index';
 function OrganisationsSkeleton() {
   return (
     <PageSkeleton>
-      <div className="max-w-sm mb-5">
+      <div className="mb-5">
         <Skeleton delay={0} className="h-9 rounded-lg" />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

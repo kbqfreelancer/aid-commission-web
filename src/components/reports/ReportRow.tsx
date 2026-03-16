@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Eye, Pencil, Trash2, CheckCircle2, XCircle, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/index';
@@ -9,6 +10,7 @@ import { formatDate, quarterLabel } from '@/lib/utils';
 import type { HrReport, Organisation, User, ReportStatus } from '@/types';
 import { useAuthStore } from '@/stores/auth.store';
 import { useDeleteReport, useUpdateStatus } from '@/hooks/useApi';
+import { toast } from 'sonner';
 
 export function StatusBadge({ status, light }: { status: ReportStatus; light?: boolean }) {
   const v = status as 'draft' | 'submitted' | 'verified' | 'rejected';
@@ -31,11 +33,41 @@ export function StatusBadge({ status, light }: { status: ReportStatus; light?: b
 interface ReportRowProps { report: HrReport; index: number; }
 
 export function ReportRow({ report, index }: ReportRowProps) {
+  const router = useRouter();
   const { user } = useAuthStore();
   const org  = report.organisation as Organisation;
   const sub  = report.submittedBy as User;
   const del  = useDeleteReport();
   const upSt = useUpdateStatus(report._id);
+
+  const handleDelete = () => {
+    toast('Delete this draft?', {
+      description: 'This report will be permanently deleted and cannot be recovered.',
+      duration: 8000,
+      classNames: {
+        toast: '!bg-red-600 !border-red-700 !text-white',
+        title: '!text-white !font-semibold',
+        description: '!text-red-100',
+        actionButton: '!bg-white !text-red-600 !font-medium hover:!bg-red-50',
+        cancelButton: '!bg-red-700 !text-red-100 hover:!bg-red-800',
+      },
+      action: {
+        label: 'Delete',
+        onClick: async () => {
+          try {
+            await del.mutateAsync(report._id);
+            router.refresh();
+          } catch {
+            toast.error('Failed to delete report. Please try again.');
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {},
+      },
+    });
+  };
 
   const canEdit   = report.status === 'draft' && (user?.role !== 'data_entry' || sub?._id === user._id);
   const canSubmit = report.status === 'draft' && canEdit;
@@ -147,7 +179,7 @@ export function ReportRow({ report, index }: ReportRowProps) {
                   variant="ghost"
                   size="icon-sm"
                   className="h-8 w-8 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 transition-colors"
-                  onClick={() => { if (confirm('Delete this draft?')) del.mutate(report._id); }}
+                  onClick={handleDelete}
                 >
                   <Trash2 size={16} strokeWidth={2} />
                 </Button>

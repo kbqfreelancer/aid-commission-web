@@ -96,22 +96,37 @@ export function Sidebar() {
             {adminItems.map((item) => <NavLink key={item.href} {...item} />)}
           </>
         )}
-
-        {/* Toggle */}
-        <div className={cn('pt-2', collapsed ? 'flex justify-center' : '')}>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setCollapsed(!collapsed)}
-            className={cn('text-muted-foreground hover:text-foreground', collapsed ? 'w-full' : 'w-full justify-start px-3')}
-          >
-            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </Button>
-        </div>
       </nav>
 
-      {/* User block */}
-      <div className={cn('border-t border-border flex shrink-0', collapsed ? 'px-0 py-3 justify-center' : 'px-3 py-3')}>
+      {/* Footer: collapse + logout */}
+      <div className={cn('border-t border-border flex shrink-0 flex-col', collapsed ? 'px-0 py-3' : 'px-3 py-3')}>
+        {/* Collapse toggle */}
+        <div className={cn('flex', collapsed ? 'justify-center' : '')}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setCollapsed(!collapsed)}
+                className={cn(
+                  'rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/80',
+                  collapsed ? 'h-8 w-8' : 'w-full justify-start gap-2 px-3 h-8'
+                )}
+              >
+                {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                {!collapsed && <span className="text-xs">Collapse</span>}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={8}>
+              {collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            </TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Divider */}
+        <div className={cn('my-2 h-px bg-border', collapsed ? 'mx-2' : '')} />
+
+        {/* User + Logout */}
         {collapsed ? (
           <div className="flex flex-col items-center gap-2">
             <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
@@ -123,9 +138,9 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={14} />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={8}>Sign out</TooltipContent>
@@ -146,7 +161,7 @@ export function Sidebar() {
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
             >
               <LogOut size={13} />
               <span>Sign out</span>

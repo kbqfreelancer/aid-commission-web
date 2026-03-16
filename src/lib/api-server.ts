@@ -63,6 +63,26 @@ async function getRedirectPath(): Promise<string> {
   return '/dashboard';
 }
 
+const FETCH_TIMEOUT_MS = 30_000;
+const RETRY_DELAY_MS = 3_000;
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit & { headers: HeadersInit }
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+    return res;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export async function serverFetch<T>(
   path: string,
   init?: RequestInit,
@@ -78,11 +98,38 @@ export async function serverFetch<T>(
   if (token) {
     (headersInit as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
-  const res = await fetch(url, {
-    ...init,
-    headers: headersInit,
-    cache: 'no-store',
-  });
+
+  const doFetch = () =>
+    fetchWithTimeout(url, {
+      ...init,
+      headers: headersInit,
+      cache: 'no-store',
+    });
+
+  let res: Response;
+  try {
+    res = await doFetch();
+  } catch (err) {
+    const msg =
+      err instanceof Error
+        ? err.message
+        : String(err);
+    const isConnectionError =
+      /fetch failed|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENOTFOUND|network/i.test(msg) ||
+      (err instanceof Error && err.name === 'AbortError');
+    if (isConnectionError) {
+      await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+      try {
+        res = await doFetch();
+      } catch (retryErr) {
+        throw new Error(
+          'Unable to reach the API. The backend may be starting up—please try again in a moment.'
+        );
+      }
+    } else {
+      throw err;
+    }
+  }
   const json = (await res.json()) as ApiResponse<unknown>;
   if (!res.ok) {
     const message = (json as ApiResponse<unknown>).message ?? 'Request failed';

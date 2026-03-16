@@ -3,12 +3,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Save, Send, ArrowLeft } from 'lucide-react';
+import { Save, Send, ArrowLeft, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import { useHeader } from '@/components/layout/HeaderContext';
+import { HEADER_BACK_CLASS } from '@/components/layout/headerStyles';
 import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Label,
   Textarea,
@@ -53,6 +54,13 @@ function getOrgId(org: HrReport['organisation']): string {
   return typeof org === 'string' ? org : org?._id ?? '';
 }
 
+function hasAnyValue(obj: unknown): boolean {
+  if (typeof obj === 'number') return obj > 0;
+  if (obj && typeof obj === 'object')
+    return Object.values(obj).some(hasAnyValue);
+  return false;
+}
+
 export function ReportEditClient({
   report,
   indicators,
@@ -80,6 +88,9 @@ export function ReportEditClient({
   const [indData, setIndData] = useState<Record<string, Record<string, unknown>>>(
     () => (report.data ?? {}) as Record<string, Record<string, unknown>>
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const filledCount = indicators?.filter((ind) => hasAnyValue(indData[ind.id])).length ?? 0;
 
   const handleCellChange = useCallback(
     (indicatorId: string, field: string, path: string[], value: number) => {
@@ -107,6 +118,7 @@ export function ReportEditClient({
       toast.error('Select a reporting quarter');
       return;
     }
+    setIsSubmitting(submitAfter);
 
     const payload = {
       organisation: orgId,
@@ -127,6 +139,8 @@ export function ReportEditClient({
       router.push('/reports');
     } catch {
       /* error handled by mutation hook */
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -135,7 +149,7 @@ export function ReportEditClient({
       title: 'Edit Report',
       description: 'Update HR indicator summary report',
       actions: (
-        <Button variant="outline" size="sm" asChild className="rounded-lg border-gray-200">
+        <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
           <Link href={`/reports/${id}`}>
             <ArrowLeft size={13} /> Back
           </Link>
@@ -146,16 +160,23 @@ export function ReportEditClient({
   }, [setHeader, clearHeader, id]);
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto pb-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <motion.div
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="lg:self-start"
         >
-          <Card className="lg:sticky lg:top-24">
+          <Card className="lg:sticky lg:top-24 rounded-2xl border-2 border-border bg-card shadow-md">
             <CardHeader>
-              <CardTitle className="text-base">Report Details</CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-base">Report Details</CardTitle>
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                  <ClipboardList size={16} className="text-amber-500" />
+                </div>
+              </div>
+              <CardDescription className="text-xs mt-1">Organisation and reporting period</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
@@ -242,7 +263,7 @@ export function ReportEditClient({
                   onClick={() => handleSave(false)}
                   loading={updateMutation.isPending}
                 >
-                  <Save size={14} /> Save as Draft
+                  <Save size={14} /> {updateMutation.isPending ? 'Saving…' : 'Save as Draft'}
                 </Button>
                 {['data_entry', 'supervisor', 'admin'].includes(serverUser?.role ?? '') && (
                   <Button
@@ -251,7 +272,7 @@ export function ReportEditClient({
                     onClick={() => handleSave(true)}
                     loading={updateMutation.isPending}
                   >
-                    <Send size={14} /> Save & Submit
+                    <Send size={14} /> {updateMutation.isPending ? (isSubmitting ? 'Submitting…' : 'Saving…') : 'Save & Submit'}
                   </Button>
                 )}
               </div>
@@ -265,13 +286,28 @@ export function ReportEditClient({
           transition={{ delay: 0.1, duration: 0.35 }}
           className="lg:col-span-2"
         >
-          <Card>
+          <Card className="rounded-2xl border border-border bg-card shadow-md">
             <CardHeader>
-              <CardTitle className="text-base">Indicator Data</CardTitle>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-base">Indicator Data</CardTitle>
+                {indicators?.length > 0 && (
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-xs font-medium text-muted-foreground tabular-nums">
+                      {filledCount} of {indicators.length} filled
+                    </span>
+                    <div className="h-1.5 w-24 rounded-full bg-muted overflow-hidden" role="progressbar" aria-valuenow={filledCount} aria-valuemin={0} aria-valuemax={indicators.length} aria-label="Indicator completion progress">
+                      <div
+                        className="h-full bg-amber-500/80 rounded-full transition-all duration-300"
+                        style={{ width: `${indicators.length ? (filledCount / indicators.length) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <CardDescription className="text-xs mt-1">
                 Enter counts for each indicator. All fields are optional — save as draft and
                 return later.
-              </p>
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {indicators?.length ? (

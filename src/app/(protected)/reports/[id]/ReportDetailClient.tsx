@@ -15,6 +15,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useHeader } from '@/components/layout/HeaderContext';
+import { HEADER_PRIMARY_CLASS, HEADER_BACK_CLASS } from '@/components/layout/headerStyles';
 import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,17 +51,15 @@ function ReportHeaderActions({
   canReject,
   updateStatusRef,
 }: ReportHeaderActionsProps) {
-  const btnClass =
-    'rounded-lg border-gray-300 bg-white text-gray-800 hover:bg-gray-50 hover:border-gray-400 shadow-sm';
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <Button variant="outline" size="sm" asChild className={btnClass}>
+    <div className="flex items-center gap-2">
+      <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
         <Link href="/reports">
           <ArrowLeft size={13} /> Back
         </Link>
       </Button>
       {canEdit && (
-        <Button variant="outline" size="sm" asChild className={btnClass}>
+        <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
           <Link href={`/reports/${id}/edit`}>
             <Pencil size={13} /> Edit
           </Link>
@@ -72,7 +71,7 @@ function ReportHeaderActions({
           size="sm"
           onClick={() => updateStatusRef.current.mutate({ status: 'submitted' })}
           loading={updateStatusRef.current.isPending}
-          className={btnClass}
+          className={HEADER_BACK_CLASS}
         >
           <Send size={13} /> Submit
         </Button>
@@ -82,7 +81,7 @@ function ReportHeaderActions({
           size="sm"
           onClick={() => updateStatusRef.current.mutate({ status: 'verified' })}
           loading={updateStatusRef.current.isPending}
-          className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-md border-0"
+          className={HEADER_PRIMARY_CLASS}
         >
           <CheckCircle2 size={13} /> Verify
         </Button>

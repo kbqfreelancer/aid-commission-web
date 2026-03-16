@@ -75,6 +75,9 @@ body::before {
   z-index: 0;
 }
 
+/* ─── Buttons ──────────────────────────────────────────────────────────────── */
+button { cursor: pointer; }
+
 /* ─── Typography ──────────────────────────────────────────────────────────── */
 h1, h2, h3 { font-family: var(--font-display), serif; }
 code, kbd, pre, .mono { font-family: var(--font-mono), monospace; }

@@ -2,12 +2,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Save, Send, ArrowLeft } from 'lucide-react';
+import { Save, Send, ArrowLeft, ClipboardList, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useHeader } from '@/components/layout/HeaderContext';
+import { HEADER_PRIMARY_CLASS, HEADER_BACK_CLASS } from '@/components/layout/headerStyles';
 import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Input,
   Label,
@@ -20,6 +21,7 @@ import {
 } from '@/components/ui/index';
 import { DynamicIndicatorForm } from '@/components/forms/DynamicIndicatorForm';
 import { useCreateReport } from '@/hooks/useApi';
+import { cn } from '@/lib/utils';
 import { updateReportStatusAction } from '@/lib/actions';
 import { toast } from 'sonner';
 import type { Organisation, IndicatorDefinition } from '@/types';
@@ -28,6 +30,13 @@ const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i);
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'] as const;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function hasAnyValue(obj: unknown): boolean {
+    if (typeof obj === 'number') return obj > 0;
+    if (obj && typeof obj === 'object')
+      return Object.values(obj).some(hasAnyValue);
+    return false;
+  }
 
 function deepSet(
   obj: Record<string, unknown>,
@@ -66,6 +75,10 @@ export function NewReportClient({
   const [month, setMonth] = useState('');
   const [notes, setNotes] = useState('');
   const [indData, setIndData] = useState<Record<string, Record<string, unknown>>>({});
+  const [errors, setErrors] = useState<{ org?: string; quarter?: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const filledCount = indicators?.filter((ind) => hasAnyValue(indData[ind.id])).length ?? 0;
 
   const handleCellChange = useCallback(
     (indicatorId: string, field: string, path: string[], value: number) => {
@@ -85,14 +98,15 @@ export function NewReportClient({
   );
 
   const handleSave = async (submitAfter = false) => {
-    if (!orgId) {
-      toast.error('Select an organisation');
+    const newErrors: { org?: string; quarter?: string } = {};
+    if (!orgId) newErrors.org = 'Select an organisation';
+    if (!quarter) newErrors.quarter = 'Select a reporting quarter';
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      toast.error(newErrors.org ?? newErrors.quarter);
       return;
     }
-    if (!quarter) {
-      toast.error('Select a reporting quarter');
-      return;
-    }
+    setIsSubmitting(submitAfter);
 
     const payload = {
       organisation: orgId,
@@ -113,18 +127,17 @@ export function NewReportClient({
       router.push('/reports');
     } catch {
       /* error handled by mutation hook */
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
     setHeader({
       title: 'New Report',
-      description: 'Create a new HR indicator summary report',
+      description: 'Select organisation and period, then enter indicator counts. Save as draft anytime.',
       actions: (
-        <Button variant="outline" size="sm" asChild className="rounded-lg border-gray-200">
-          <Link href="/reports">
-            <ArrowLeft size={13} /> Back
-          </Link>
+        <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
         </Button>
       ),
     });
@@ -132,22 +145,29 @@ export function NewReportClient({
   }, [setHeader, clearHeader]);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <motion.div
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
+            className="lg:self-start"
           >
-            <Card className="lg:sticky lg:top-24">
+            <Card id="report-details" className="lg:sticky lg:top-24 rounded-2xl border-2 border-border bg-card shadow-md scroll-mt-24">
               <CardHeader>
-                <CardTitle className="text-base">Report Details</CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-base">Report Details</CardTitle>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                    <ClipboardList size={16} className="text-amber-500" />
+                  </div>
+                </div>
+                <CardDescription className="text-xs mt-1">Organisation and reporting period</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-1.5">
                   <Label>Organisation *</Label>
-                  <Select value={orgId} onValueChange={setOrgId}>
-                    <SelectTrigger>
+                  <Select value={orgId} onValueChange={(v) => { setOrgId(v); setErrors((e) => ({ ...e, org: undefined })); }}>
+                    <SelectTrigger className={errors.org ? 'border-red-500 focus:ring-red-500/50' : undefined} aria-invalid={!!errors.org}>
                       <SelectValue placeholder="Select…" />
                     </SelectTrigger>
                     <SelectContent>
@@ -158,6 +178,7 @@ export function NewReportClient({
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.org && <p className="text-xs text-red-500" aria-live="polite">{errors.org}</p>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -178,8 +199,8 @@ export function NewReportClient({
 
                 <div className="space-y-1.5">
                   <Label>Quarter *</Label>
-                  <Select value={quarter} onValueChange={setQuarter}>
-                    <SelectTrigger>
+                  <Select value={quarter} onValueChange={(v) => { setQuarter(v); setErrors((e) => ({ ...e, quarter: undefined })); }}>
+                    <SelectTrigger className={errors.quarter ? 'border-red-500 focus:ring-red-500/50' : undefined} aria-invalid={!!errors.quarter}>
                       <SelectValue placeholder="Select…" />
                     </SelectTrigger>
                     <SelectContent>
@@ -190,6 +211,7 @@ export function NewReportClient({
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.quarter && <p className="text-xs text-red-500" aria-live="polite">{errors.quarter}</p>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -224,20 +246,20 @@ export function NewReportClient({
 
                 <div className="pt-2 space-y-2">
                   <Button
-                    className="w-full"
+                    className={cn('w-full', HEADER_PRIMARY_CLASS)}
                     onClick={() => handleSave(false)}
                     loading={createMutation.isPending}
                   >
-                    <Save size={14} /> Save as Draft
+                    <Save size={14} /> {createMutation.isPending ? 'Saving…' : 'Save as Draft'}
                   </Button>
                   {['data_entry', 'supervisor', 'admin'].includes(serverUser?.role ?? '') && (
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className={cn('w-full', HEADER_BACK_CLASS)}
                       onClick={() => handleSave(true)}
                       loading={createMutation.isPending}
                     >
-                      <Send size={14} /> Save & Submit
+                      <Send size={14} /> {createMutation.isPending ? (isSubmitting ? 'Submitting…' : 'Saving…') : 'Save & Submit'}
                     </Button>
                   )}
                 </div>
@@ -251,10 +273,25 @@ export function NewReportClient({
             transition={{ delay: 0.1, duration: 0.35 }}
             className="lg:col-span-2"
           >
-            <Card>
+            <Card className="rounded-2xl border border-border bg-card shadow-md">
               <CardHeader>
-                <CardTitle className="text-base">Indicator Data</CardTitle>
-                <p className="text-xs text-muted-foreground">
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-base">Indicator Data</CardTitle>
+                  {indicators?.length > 0 && (
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-xs font-medium text-muted-foreground tabular-nums">
+                        {filledCount} of {indicators.length} filled
+                      </span>
+                      <div className="h-1.5 w-24 rounded-full bg-muted overflow-hidden" role="progressbar" aria-valuenow={filledCount} aria-valuemin={0} aria-valuemax={indicators.length} aria-label="Indicator completion progress">
+                        <div
+                          className="h-full bg-amber-500/80 rounded-full transition-all duration-300"
+                          style={{ width: `${indicators.length ? (filledCount / indicators.length) * 100 : 0}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
                   Enter counts for each indicator. All fields are optional — save as draft and
                   return later.
                 </p>
@@ -267,9 +304,16 @@ export function NewReportClient({
                     onChange={handleCellChange}
                   />
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    Could not load indicator registry. Check your connection.
-                  </p>
+                  <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-12 px-6">
+                    <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center">
+                      <AlertCircle size={24} className="text-amber-500" />
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">Could not load indicator registry</p>
+                    <p className="text-xs text-muted-foreground text-center">Check your connection and try again.</p>
+                    <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
+                      <Link href="/reports">Back to reports</Link>
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
