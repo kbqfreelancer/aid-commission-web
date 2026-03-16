@@ -1,0 +1,10 @@
+import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/api-server';
+
+export async function GET() {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ success: false, data: null }, { status: 401 });
+  }
+  return NextResponse.json({ success: true, data: { user: session.user } });
+}

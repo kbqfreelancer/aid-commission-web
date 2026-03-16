@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+/* ─── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --font-display: 'DM Serif Display';
+  --font-body:    'DM Sans';
+  --font-mono:    'JetBrains Mono';
+
+  /* Clinical dark palette */
+  --background:         222 47% 8%;
+  --foreground:         210 40% 96%;
+  --card:               222 43% 11%;
+  --card-foreground:    210 40% 96%;
+  --popover:            222 47% 9%;
+  --popover-foreground: 210 40% 96%;
+  --primary:            38 100% 50%;
+  --primary-foreground: 222 47% 6%;
+  --secondary:          222 35% 17%;
+  --secondary-foreground: 210 40% 90%;
+  --muted:              222 35% 14%;
+  --muted-foreground:   215 20% 55%;
+  --accent:             222 35% 18%;
+  --accent-foreground:  210 40% 96%;
+  --destructive:        0 72% 51%;
+  --destructive-foreground: 210 40% 98%;
+  --border:             222 35% 18%;
+  --input:              222 35% 16%;
+  --ring:               38 100% 50%;
+  --radius:             0.375rem;
+
+  /* Chart colours */
+  --chart-1: 38 100% 50%;
+  --chart-2: 199 89% 48%;
+  --chart-3: 142 71% 45%;
+  --chart-4: 271 81% 65%;
+  --chart-5: 340 82% 52%;
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
+* { border-color: hsl(var(--border)); }
+
+body {
+  background-color: hsl(var(--background));
+  color:            hsl(var(--foreground));
+  font-family:      var(--font-body), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle grid overlay on the entire app background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Typography ──────────────────────────────────────────────────────────── */
+h1, h2, h3 { font-family: var(--font-display), serif; }
+code, kbd, pre, .mono { font-family: var(--font-mono), monospace; }
+
+/* ─── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: hsl(var(--muted)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+/* ─── Utility classes ──────────────────────────────────────────────────────── */
+@layer utilities {
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--secondary)) 50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+  }
+
+  .glass {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .glow-amber {
+    box-shadow: 0 0 20px rgba(249,138,7,0.15);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, #ffd98a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, hsl(var(--primary)), transparent);
+  }
+
+  /* Status badges */
+  .status-draft     { @apply bg-muted text-muted-foreground border border-border; }
+  .status-submitted { @apply bg-blue-950/60 text-blue-300 border border-blue-800/50; }
+  .status-verified  { @apply bg-green-950/60 text-green-300 border border-green-800/50; }
+  .status-rejected  { @apply bg-red-950/60 text-red-300 border border-red-800/50; }
+}
+
+/* ─── Motion: respect reduced-motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
