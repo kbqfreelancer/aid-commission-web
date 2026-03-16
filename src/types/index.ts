@@ -138,6 +138,28 @@ export interface SummaryQueryParams {
   quarter?: string;
 }
 
+export interface AuditLogActor {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+export interface AuditLogEntry {
+  _id: string;
+  timestamp: string;
+  actorId?: AuditLogActor;
+  actorRole?: string;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  metadata?: Record<string, unknown>;
+  ip?: string;
+  userAgent?: string;
+  requestId?: string;
+  outcome?: 'success' | 'failure';
+  statusCode?: number;
+}
+
 export interface AuditLogQueryParams {
   entityType?: string;
   entityId?: string;

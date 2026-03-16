@@ -13,6 +13,7 @@ import type {
   ReportQueryParams,
   SummaryByOrgQueryParams,
   SummaryQueryParams,
+  AuditLogEntry,
   AuditLogQueryParams,
   AdminConfigKey,
   User,
@@ -190,9 +191,9 @@ export async function createAdminIndicatorAction(data: {
 
 export async function getAdminAuditLogsAction(
   params?: AuditLogQueryParams
-): Promise<ApiResponse<unknown[]>> {
+): Promise<ApiResponse<AuditLogEntry[]>> {
   const q = params ? qs(params as Record<string, string | number | undefined>) : '';
-  const res = await serverFetch<unknown[]>(`/admin/audit-logs${q}`);
+  const res = await serverFetch<AuditLogEntry[]>(`/admin/audit-logs${q}`);
   return { success: true, data: res.data ?? [], meta: res.meta };
 }
 

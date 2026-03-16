@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Shield, Users, Building2, Activity, Settings, UserPlus, FileText, Layers, ChevronRight } from 'lucide-react';
+import { Shield, Users, Building2, Activity, Settings, UserPlus, FileText, Layers, ChevronRight, ScrollText } from 'lucide-react';
 import Link from 'next/link';
 import { useHeader } from '@/components/layout/HeaderContext';
 import { useServerUser } from '@/components/layout/ServerUserContext';
@@ -282,6 +282,7 @@ export function AdminClient({
                   { label: 'View Reports', href: '/reports', icon: Activity, desc: 'Browse submissions' },
                   { label: 'New Report', href: '/reports/new', icon: FileText, desc: 'Create HR report' },
                   { label: 'Indicator Registry', href: '/indicators', icon: Layers, desc: 'View definitions' },
+                  { label: 'Audit Trails', href: '/admin/audit-logs', icon: ScrollText, desc: 'View audit logs' },
                 ].map(({ label, href, icon: Icon, desc }, i) => (
                   <motion.div
                     key={label}

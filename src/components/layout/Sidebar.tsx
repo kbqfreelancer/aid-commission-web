@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard, FileText, Building2, Settings, LogOut, ChevronLeft, ChevronRight, Shield, Activity,
+  LayoutDashboard, FileText, Building2, Settings, LogOut, ChevronLeft, ChevronRight, Shield, Activity, ScrollText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
@@ -18,6 +18,7 @@ const navItems = [
 ];
 const adminItems = [
   { href: '/admin', label: 'Admin Config', icon: Settings },
+  { href: '/admin/audit-logs', label: 'Audit Trails', icon: ScrollText },
 ];
 
 export function Sidebar() {
