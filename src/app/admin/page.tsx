@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getSession } from '@/lib/api-server';
 import { getOrganisations, getReports, getIndicators } from '@/lib/data';
@@ -21,8 +20,7 @@ function AdminSkeleton() {
 
 export default async function AdminPage() {
   const session = await getSession();
-  if (!session) redirect('/auth/login');
-  if (session.user.role !== 'admin') redirect('/dashboard');
+  if (!session) return null;
 
   const [orgs, reportsData, indicators] = await Promise.all([
     getOrganisations(),

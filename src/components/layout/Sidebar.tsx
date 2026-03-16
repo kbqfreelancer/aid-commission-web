@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
 import {
   LayoutDashboard, FileText, Building2, Settings, LogOut, ChevronLeft, ChevronRight, Shield, Activity,
 } from 'lucide-react';
@@ -61,15 +60,11 @@ export function Sidebar() {
   };
 
   return (
-    <motion.aside
-      initial={{ x: -20, opacity: 0 }}
-      animate={{
-        x: 0,
-        opacity: 1,
-        width: collapsed ? 64 : 240,
-      }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="fixed left-0 top-0 bottom-0 z-30 flex flex-col border-r border-border bg-card overflow-hidden shrink-0"
+    <aside
+      className={cn(
+        'fixed left-0 top-0 bottom-0 z-30 flex flex-col border-r border-border bg-card overflow-hidden shrink-0',
+        collapsed ? 'w-16' : 'w-60'
+      )}
     >
       {/* Logo */}
       <div className={cn('border-b border-border flex shrink-0', collapsed ? 'px-0 py-5 justify-center' : 'px-4 py-5')}>
@@ -159,6 +154,6 @@ export function Sidebar() {
           </>
         )}
       </div>
-    </motion.aside>
+    </aside>
   );
 }

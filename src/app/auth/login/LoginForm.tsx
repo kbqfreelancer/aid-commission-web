@@ -108,22 +108,22 @@ export function LoginForm() {
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-background">
       {/* Decorative left panel */}
-      <div className="hidden lg:flex flex-col w-[45%] relative bg-navy-950 border-r border-border overflow-hidden">
+      <div className="hidden lg:flex flex-col w-[45%] relative bg-brand-dark border-r border-border overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-40" />
         <div
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 30% 50%, rgba(249,138,7,0.08) 0%, transparent 60%)',
+              'radial-gradient(ellipse at 30% 50%, rgba(3,140,51,0.1) 0%, transparent 60%)',
           }}
         />
-        <div className="absolute top-0 right-0 w-px h-full bg-linear-to-b from-transparent via-amber-500/20 to-transparent" />
-        <div className="absolute bottom-1/3 left-8 right-8 h-px bg-linear-to-r from-transparent via-amber-500/15 to-transparent" />
+        <div className="absolute top-0 right-0 w-px h-full bg-linear-to-b from-transparent via-brand-gold/20 to-transparent" />
+        <div className="absolute bottom-1/3 left-8 right-8 h-px bg-linear-to-r from-transparent via-brand-gold/15 to-transparent" />
 
-        <div className="relative z-10 flex flex-col justify-between h-full p-12">
+        <div className="relative z-10 flex flex-col justify-between h-full p-14">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center">
-              <Shield size={18} className="text-navy-950" />
+            <div className="w-9 h-9 bg-brand-gold rounded-lg flex items-center justify-center">
+              <Shield size={18} className="text-brand-black" />
             </div>
             <div>
               <p className="font-display text-base text-foreground">NHIDRS</p>
@@ -158,9 +158,9 @@ export function LoginForm() {
               transition={{ delay: 0.5 }}
               className="mt-8 min-h-[100px]"
             >
-              <div className="group relative overflow-hidden rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 transition-colors hover:border-amber-500/30 hover:bg-amber-500/8 [perspective:500px]">
-                <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-400/90 mb-3">
+              <div className="group relative overflow-hidden rounded-xl border border-brand-gold/25 bg-brand-gold/5 p-5 transition-colors hover:border-brand-gold/35 hover:bg-brand-gold/8 [perspective:500px]">
+                <div className="absolute inset-0 bg-linear-to-br from-brand-gold/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <p className="text-[10px] font-mono uppercase tracking-widest text-brand-gold/90 mb-3">
                   What NHIDRS does
                 </p>
                 <div className="min-h-10 flex items-center">
@@ -174,11 +174,11 @@ export function LoginForm() {
                       key={i}
                       type="button"
                       onClick={() => setFlipIndex(i)}
-                      className="h-1.5 flex-1 min-w-0 overflow-hidden rounded-full bg-border/80 transition-colors hover:bg-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:ring-offset-2 focus:ring-offset-transparent"
+                      className="h-1.5 flex-1 min-w-0 overflow-hidden rounded-full bg-border/80 cursor-pointer transition-colors hover:bg-brand-gold/30 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 focus:ring-offset-2 focus:ring-offset-transparent"
                       aria-label={`Go to slide ${i + 1}`}
                     >
                       <motion.span
-                        className="block h-full rounded-full bg-amber-500/70"
+                        className="block h-full rounded-full bg-brand-gold/70"
                         initial={false}
                         animate={{
                           width: i === flipIndex ? `${flipProgress * 100}%` : i < flipIndex ? '100%' : '0%',
@@ -199,7 +199,7 @@ export function LoginForm() {
       </div>
 
       {/* Login form */}
-      <div className="flex-1 flex items-center justify-center p-8 relative z-10">
+      <div className="flex-1 flex items-center justify-center p-8 relative z-10 bg-[#f0fdf4]">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -207,55 +207,56 @@ export function LoginForm() {
           className="w-full max-w-sm"
         >
           <div className="flex lg:hidden items-center gap-2.5 mb-8">
-            <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <Shield size={16} className="text-navy-950" />
+            <div className="w-8 h-8 bg-brand-gold rounded-lg flex items-center justify-center">
+              <Shield size={16} className="text-brand-black" />
             </div>
-            <p className="font-display text-lg text-foreground">NHIDRS</p>
+            <p className="font-display text-lg text-gray-900">NHIDRS</p>
           </div>
 
           <div className="mb-8">
-            <h1 className="font-display text-2xl text-foreground mb-1">Sign in</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="font-display text-2xl text-gray-900 mb-1">Sign in</h1>
+            <p className="text-sm text-gray-600">
               Enter your credentials to access the platform
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email address</Label>
+              <Label htmlFor="email" className="text-gray-700">Email address</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="you@organisation.org"
+                className="bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus-visible:ring-brand-green/50 focus-visible:border-brand-green/50"
                 {...register('email')}
               />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPw ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="pr-9"
+                  className="pr-9 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus-visible:ring-brand-green/50 focus-visible:border-brand-green/50"
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer transition-colors"
                 >
                   {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-destructive">{errors.password.message}</p>
+                <p className="text-xs text-red-600">{errors.password.message}</p>
               )}
             </div>
 
-            <Button type="submit" className="w-full" loading={loading}>
+            <Button type="submit" className="w-full bg-brand-green hover:bg-[#027a2d] text-white shadow-md hover:shadow-lg transition-shadow" loading={loading}>
               {!loading && (
                 <>
                   <span>Sign in</span>
@@ -265,8 +266,8 @@ export function LoginForm() {
             </Button>
           </form>
 
-          <div className="mt-6 p-3 bg-secondary/40 border border-border rounded-md">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">
+          <div className="mt-6 p-4 bg-white/80 border border-gray-200/80 rounded-xl border-l-4 border-l-brand-green shadow-sm">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">
               Demo credentials
             </p>
             {[
@@ -274,9 +275,9 @@ export function LoginForm() {
               { role: 'Supervisor', email: 'supervisor@pudhr.org', pw: 'Super1234!' },
               { role: 'Officer', email: 'officer@pudhr.org', pw: 'Officer1234!' },
             ].map((c) => (
-              <div key={c.role} className="flex items-center justify-between py-1 text-xs">
-                <span className="text-muted-foreground">{c.role}</span>
-                <span className="font-mono text-foreground/70">{c.email}</span>
+              <div key={c.role} className="flex items-center justify-between py-1.5 text-xs">
+                <span className="text-gray-600">{c.role}</span>
+                <span className="font-mono text-gray-800">{c.email}</span>
               </div>
             ))}
           </div>

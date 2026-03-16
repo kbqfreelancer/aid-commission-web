@@ -15,9 +15,11 @@ interface AppShellProps {
   actions?: React.ReactNode;
   /** Server-provided user for RSC pages; skips store check when present */
   serverUser?: User | null;
+  contentClassName?: string;
+  headerClassName?: string;
 }
 
-function AppShellInner({ children, title, description, actions, serverUser }: AppShellProps) {
+function AppShellInner({ children, title, description, actions, serverUser, contentClassName, headerClassName }: AppShellProps) {
   const router = useRouter();
   const { isAuthenticated, setUser } = useAuthStore();
   const { collapsed } = useSidebar();
@@ -38,7 +40,7 @@ function AppShellInner({ children, title, description, actions, serverUser }: Ap
       <Sidebar />
       <main className={cn('flex-1 min-h-screen flex flex-col transition-[margin] duration-200 ease-out', collapsed ? 'ml-16' : 'ml-60')}>
         {(title || actions) && (
-          <header className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-sm px-8 py-4">
+          <header className={cn('sticky top-0 z-20 border-b border-gray-200 bg-white shadow-sm px-8 py-4 [&_h1]:text-gray-900 [&_p]:text-gray-700', headerClassName)}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 {title && (
@@ -62,7 +64,7 @@ function AppShellInner({ children, title, description, actions, serverUser }: Ap
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="flex-1 px-8 py-6"
+          className={cn('flex-1 px-8 py-6 min-h-full bg-green-50', contentClassName)}
         >
           {children}
         </motion.div>

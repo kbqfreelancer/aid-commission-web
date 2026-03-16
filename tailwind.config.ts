@@ -15,7 +15,15 @@ const config: Config = {
         mono: ['var(--font-mono)', 'monospace'],
       },
       colors: {
-        // Deep clinical navy palette
+        // Ghana AIDS Commission brand
+        brand: {
+          red:   '#F22233',
+          green: '#038C33',
+          dark:  '#022601',
+          gold:  '#F2BC1B',
+          black: '#0D0D0D',
+        },
+        // Deep clinical navy palette (fallback)
         navy: {
           50:  '#eef2f9',
           100: '#d5dff0',

@@ -17,12 +17,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <Toaster
         theme="dark"
         position="bottom-right"
+        richColors
+        closeButton
         toastOptions={{
           style: {
-            background: 'hsl(222,43%,11%)',
-            border: '1px solid hsl(222,35%,18%)',
+            background: 'hsl(118,95%,10%)',
+            border: '1px solid hsl(118,95%,18%)',
             color: 'hsl(210,40%,96%)',
             fontFamily: 'var(--font-body)',
+          },
+          classNames: {
+            success: 'border-l-4 border-l-[#038C33]',
+            error: 'border-l-4 border-l-[#F22233]',
+            warning: 'border-l-4 border-l-[#F2BC1B]',
           },
         }}
       />

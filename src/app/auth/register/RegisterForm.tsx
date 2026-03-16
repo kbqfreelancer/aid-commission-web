@@ -96,8 +96,8 @@ export function RegisterForm() {
         className="w-full max-w-sm"
       >
         <div className="flex items-center gap-2.5 mb-8">
-          <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-            <Shield size={16} className="text-navy-950" />
+          <div className="w-8 h-8 bg-brand-gold rounded-lg flex items-center justify-center">
+            <Shield size={16} className="text-brand-black" />
           </div>
           <p className="font-display text-lg text-foreground">NHIDRS</p>
         </div>
@@ -169,7 +169,7 @@ export function RegisterForm() {
           Already have an account?{' '}
           <Link
             href="/auth/login"
-            className="text-amber-400 hover:text-amber-300 transition-colors"
+            className="text-brand-gold hover:text-brand-gold/80 transition-colors"
           >
             Sign in
           </Link>

@@ -9,34 +9,42 @@
   --font-body:    var(--font-outfit), sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
 
-  /* Clinical dark palette */
-  --background:         222 47% 8%;
-  --foreground:         210 40% 96%;
-  --card:               222 43% 11%;
-  --card-foreground:    210 40% 96%;
-  --popover:            222 47% 9%;
-  --popover-foreground: 210 40% 96%;
-  --primary:            38 100% 50%;
-  --primary-foreground: 222 47% 6%;
-  --secondary:          222 35% 17%;
-  --secondary-foreground: 210 40% 90%;
-  --muted:              222 35% 14%;
-  --muted-foreground:   215 20% 55%;
-  --accent:             222 35% 18%;
-  --accent-foreground:  210 40% 96%;
-  --destructive:        0 72% 51%;
-  --destructive-foreground: 210 40% 98%;
-  --border:             222 35% 18%;
-  --input:              222 35% 16%;
-  --ring:               38 100% 50%;
-  --radius:             0.375rem;
+  /* Ghana AIDS Commission brand */
+  --brand-red:    355 88% 54%;   /* #F22233 */
+  --brand-green:  141 96% 28%;   /* #038C33 */
+  --brand-dark:   118 95% 8%;    /* #022601 */
+  --brand-gold:   44 89% 53%;    /* #F2BC1B */
+  --brand-black:  0 0% 5%;       /* #0D0D0D */
 
-  /* Chart colours */
-  --chart-1: 38 100% 50%;
-  --chart-2: 199 89% 48%;
-  --chart-3: 142 71% 45%;
-  --chart-4: 271 81% 65%;
-  --chart-5: 340 82% 52%;
+  /* Semantic palette (brand-aligned) */
+  --background:         118 95% 8%;
+  --foreground:         210 40% 96%;
+  --card:               118 95% 10%;
+  --card-foreground:     210 40% 96%;
+  --popover:             118 95% 9%;
+  --popover-foreground:  210 40% 96%;
+  --primary:             355 88% 54%;
+  --primary-foreground:  0 0% 100%;
+  --secondary:           118 95% 14%;
+  --secondary-foreground: 210 40% 90%;
+  --muted:               118 95% 12%;
+  --muted-foreground:    215 20% 55%;
+  --accent:              118 95% 15%;
+  --accent-foreground:   210 40% 96%;
+  --destructive:         355 88% 54%;
+  --destructive-foreground: 0 0% 100%;
+  --success:             141 96% 28%;
+  --border:              118 95% 15%;
+  --input:               118 95% 13%;
+  --ring:                355 88% 54%;
+  --radius:              0.375rem;
+
+  /* Chart colours (brand palette) */
+  --chart-1: 44 89% 53%;
+  --chart-2: 141 96% 28%;
+  --chart-3: 355 88% 54%;
+  --chart-4: 199 89% 48%;
+  --chart-5: 271 81% 65%;
 }
 
 /* ─── Base ─────────────────────────────────────────────────────────────────── */
@@ -96,12 +104,12 @@ code, kbd, pre, .mono { font-family: var(--font-mono), monospace; }
     border: 1px solid rgba(255,255,255,0.08);
   }
 
-  .glow-amber {
-    box-shadow: 0 0 20px rgba(249,138,7,0.15);
+  .glow-brand {
+    box-shadow: 0 0 20px rgba(242,34,51,0.12), 0 0 40px rgba(242,188,27,0.08);
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, #ffd98a 100%);
+    background: linear-gradient(135deg, hsl(var(--brand-gold)) 0%, hsl(var(--brand-red)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -116,14 +124,14 @@ code, kbd, pre, .mono { font-family: var(--font-mono), monospace; }
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: linear-gradient(90deg, hsl(var(--primary)), transparent);
+    background: linear-gradient(90deg, hsl(var(--brand-red)), transparent);
   }
 
-  /* Status badges */
+  /* Status badges (brand-aligned) */
   .status-draft     { @apply bg-muted text-muted-foreground border border-border; }
-  .status-submitted { @apply bg-blue-950/60 text-blue-300 border border-blue-800/50; }
-  .status-verified  { @apply bg-green-950/60 text-green-300 border border-green-800/50; }
-  .status-rejected  { @apply bg-red-950/60 text-red-300 border border-red-800/50; }
+  .status-submitted { @apply bg-brand-gold/10 text-brand-gold border border-brand-gold/30; }
+  .status-verified  { @apply bg-brand-green/20 text-green-300 border border-brand-green/40; }
+  .status-rejected  { @apply bg-brand-red/20 text-red-300 border border-brand-red/40; }
 }
 
 /* ─── Motion: respect reduced-motion ─────────────────────────────────────── */
