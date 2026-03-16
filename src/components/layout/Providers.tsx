@@ -28,7 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           },
           classNames: {
             success: 'border-l-4 border-l-[#038C33]',
-            error: 'border-l-4 border-l-[#F22233]',
+            error: '!bg-red-600/90 border-l-4 border-l-red-400',
             warning: 'border-l-4 border-l-[#F2BC1B]',
           },
         }}

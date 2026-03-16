@@ -1,14 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Search, Filter, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { AppShell } from '@/components/layout/AppShell';
+import { cn } from '@/lib/utils';
+import { useHeader } from '@/components/layout/HeaderContext';
+import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
 import { ReportRow, ReportTableSkeleton } from '@/components/reports/ReportRow';
-import type { HrReport, Organisation, User } from '@/types';
+import type { HrReport, Organisation } from '@/types';
 
 const STATUSES = ['draft', 'submitted', 'verified', 'rejected'] as const;
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'] as const;
@@ -19,15 +21,15 @@ export function ReportsClient({
   reports,
   orgs,
   meta,
-  serverUser,
 }: {
   reports: HrReport[];
   orgs: Organisation[];
   meta: { total: number; page: number; limit: number; pages: number } | undefined;
-  serverUser: User;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setHeader, clearHeader } = useHeader();
+  const serverUser = useServerUser();
   const [search, setSearch] = useState('');
   const page = Number(searchParams.get('page') || '1');
   const orgId = searchParams.get('org') || '';
@@ -64,19 +66,23 @@ export function ReportsClient({
 
   const hasFilters = orgId || year || quarter || status || search;
 
-  return (
-    <AppShell
-      serverUser={serverUser}
-      title="Reports"
-      description="Manage and track HR indicator report submissions"
-      actions={
-        <Button size="sm" asChild>
+  useEffect(() => {
+    setHeader({
+      title: 'Reports',
+      description: 'Manage and track HR indicator report submissions',
+      actions: (
+        <Button size="sm" asChild className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
           <Link href="/reports/new">
             <Plus size={14} /> New Report
           </Link>
         </Button>
-      }
-    >
+      ),
+    });
+    return clearHeader;
+  }, [setHeader, clearHeader]);
+
+  return (
+    <>
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -177,16 +183,36 @@ export function ReportsClient({
         )}
       </motion.div>
 
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="rounded-2xl bg-white border border-gray-200 shadow-md overflow-hidden transition-shadow hover:shadow-lg"
+      >
+        <div className="px-6 pt-6 pb-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900">Reports</h2>
+            <p className="text-xs font-mono text-gray-500">
+              {meta ? `${(page - 1) * 20 + 1}–${Math.min(page * 20, meta.total)} of ${meta.total}` : '—'}
+            </p>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            HR indicator report submissions asdfasdfds
+          </p>
+        </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[900px] table-auto">
             <thead>
-              <tr className="border-b border-border bg-secondary/20">
+              <tr className="border-b border-gray-200 bg-gray-50/80">
                 {['Organisation', 'Period', 'Status', 'Submitted by', 'Created', 'Actions'].map(
                   (h) => (
                     <th
                       key={h}
-                      className="px-4 py-2.5 text-left text-[10px] font-mono uppercase tracking-widest text-muted-foreground"
+                      className={cn(
+                        'px-6 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-gray-500',
+                        h === 'Actions' && 'whitespace-nowrap'
+                      )}
+                      style={h === 'Actions' ? { minWidth: 200 } : undefined}
                     >
                       {h}
                     </th>
@@ -197,9 +223,9 @@ export function ReportsClient({
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center">
-                    <p className="text-sm text-muted-foreground">No reports found</p>
-                    <Button variant="outline" size="sm" className="mt-3" asChild>
+                  <td colSpan={6} className="px-6 py-16 text-center">
+                    <p className="text-sm text-gray-500 font-medium">No reports found</p>
+                    <Button variant="outline" size="sm" className="mt-4 rounded-lg" asChild>
                       <Link href="/reports/new">Create first report</Link>
                     </Button>
                   </td>
@@ -212,34 +238,33 @@ export function ReportsClient({
         </div>
 
         {meta && meta.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-            <p className="text-xs text-muted-foreground font-mono">
-              {(page - 1) * 20 + 1}–{Math.min(page * 20, meta.total)} of {meta.total}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+            <p className="text-xs font-mono text-gray-500">
+              Page {page} of {meta.pages}
             </p>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                size="icon-sm"
+                size="sm"
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
+                className="rounded-lg h-8"
               >
-                <ChevronLeft size={13} />
+                <ChevronLeft size={14} />
               </Button>
-              <span className="text-xs font-mono text-muted-foreground px-2">
-                {page}/{meta.pages}
-              </span>
               <Button
                 variant="outline"
-                size="icon-sm"
+                size="sm"
                 onClick={() => setPage(Math.min(meta.pages, page + 1))}
                 disabled={page === meta.pages}
+                className="rounded-lg h-8"
               >
-                <ChevronRight size={13} />
+                <ChevronRight size={14} />
               </Button>
             </div>
           </div>
         )}
-      </div>
-    </AppShell>
+      </motion.div>
+    </>
   );
 }

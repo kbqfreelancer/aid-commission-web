@@ -1,10 +1,11 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Save, Send, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { AppShell } from '@/components/layout/AppShell';
+import { useHeader } from '@/components/layout/HeaderContext';
+import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -21,7 +22,7 @@ import { DynamicIndicatorForm } from '@/components/forms/DynamicIndicatorForm';
 import { useCreateReport } from '@/hooks/useApi';
 import { updateReportStatusAction } from '@/lib/actions';
 import { toast } from 'sonner';
-import type { Organisation, IndicatorDefinition, User } from '@/types';
+import type { Organisation, IndicatorDefinition } from '@/types';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i);
@@ -50,13 +51,13 @@ function deepSet(
 export function NewReportClient({
   indicators,
   orgs,
-  serverUser,
 }: {
   indicators: IndicatorDefinition[];
   orgs: Organisation[];
-  serverUser: User;
 }) {
   const router = useRouter();
+  const { setHeader, clearHeader } = useHeader();
+  const serverUser = useServerUser();
   const createMutation = useCreateReport();
 
   const [orgId, setOrgId] = useState('');
@@ -115,20 +116,23 @@ export function NewReportClient({
     }
   };
 
-  return (
-    <AppShell
-      serverUser={serverUser}
-      title="New Report"
-      description="Create a new HR indicator summary report"
-      actions={
-        <Button variant="ghost" size="sm" asChild>
+  useEffect(() => {
+    setHeader({
+      title: 'New Report',
+      description: 'Create a new HR indicator summary report',
+      actions: (
+        <Button variant="outline" size="sm" asChild className="rounded-lg border-gray-200">
           <Link href="/reports">
             <ArrowLeft size={13} /> Back
           </Link>
         </Button>
-      }
-    >
-      <div className="max-w-4xl mx-auto">
+      ),
+    });
+    return clearHeader;
+  }, [setHeader, clearHeader]);
+
+  return (
+    <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -272,6 +276,5 @@ export function NewReportClient({
           </motion.div>
         </div>
       </div>
-    </AppShell>
   );
 }

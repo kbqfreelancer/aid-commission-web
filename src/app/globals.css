@@ -98,6 +98,17 @@ code, kbd, pre, .mono { font-family: var(--font-mono), monospace; }
     animation: shimmer 1.8s linear infinite;
   }
 
+  .shimmer-skeleton {
+    background: linear-gradient(
+      90deg,
+      rgb(229 231 235) 25%,
+      rgb(243 244 246) 50%,
+      rgb(229 231 235) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+  }
+
   .glass {
     background: rgba(255,255,255,0.04);
     backdrop-filter: blur(12px);

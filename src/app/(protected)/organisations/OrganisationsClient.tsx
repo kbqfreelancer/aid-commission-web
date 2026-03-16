@@ -1,15 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Plus, Building2, MapPin, Mail, Phone, Pencil, PowerOff } from 'lucide-react';
-import { AppShell } from '@/components/layout/AppShell';
+import { useHeader } from '@/components/layout/HeaderContext';
+import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge, Input, Label } from '@/components/ui/index';
 import { useCreateOrg, useUpdateOrg, useDeactivateOrg } from '@/hooks/useApi';
 import { toast } from 'sonner';
-import type { Organisation, User } from '@/types';
+import type { Organisation } from '@/types';
 
 function OrgModal({
   org,
@@ -182,16 +183,29 @@ function OrgCard({
 
 export function OrganisationsClient({
   orgs,
-  serverUser,
 }: {
   orgs: Organisation[];
-  serverUser: User;
 }) {
   const router = useRouter();
+  const { setHeader, clearHeader } = useHeader();
+  const serverUser = useServerUser();
   const deactivateOrg = useDeactivateOrg();
   const isAdmin = serverUser?.role === 'admin';
   const [modal, setModal] = useState<'new' | Organisation | null>(null);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    setHeader({
+      title: 'Organisations',
+      description: 'State agencies and health facilities registered in the system',
+      actions: isAdmin ? (
+        <Button size="sm" onClick={() => setModal('new')} className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
+          <Plus size={14} /> Add Organisation
+        </Button>
+      ) : undefined,
+    });
+    return clearHeader;
+  }, [setHeader, clearHeader, isAdmin]);
 
   const filtered =
     orgs?.filter(
@@ -216,18 +230,7 @@ export function OrganisationsClient({
   };
 
   return (
-    <AppShell
-      serverUser={serverUser}
-      title="Organisations"
-      description="State agencies and health facilities registered in the system"
-      actions={
-        isAdmin && (
-          <Button size="sm" onClick={() => setModal('new')}>
-            <Plus size={14} /> Add Organisation
-          </Button>
-        )
-      }
-    >
+    <>
       <div className="mb-5">
         <Input
           placeholder="Search organisations, regions, districts…"
@@ -276,6 +279,6 @@ export function OrganisationsClient({
           onSuccess={handleModalSuccess}
         />
       )}
-    </AppShell>
+    </>
   );
 }

@@ -2,10 +2,11 @@
  * Server-side API client. Uses cookies() for auth. No localStorage.
  * Use only in Server Components, Server Actions, Route Handlers.
  */
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { redirect, unstable_rethrow } from 'next/navigation';
 import { cache } from 'react';
 import { API_BASE } from '@/config/api';
-import type { ApiResponse, User } from '@/types';
+import type { ApiResponse, AuthResponse, User } from '@/types';
 
 const COOKIE_ACCESS = 'pud_access_token';
 const COOKIE_REFRESH = 'pud_refresh_token';
@@ -15,28 +16,101 @@ async function getAccessToken(): Promise<string | null> {
   return c.get(COOKIE_ACCESS)?.value ?? null;
 }
 
+async function getRefreshToken(): Promise<string | null> {
+  const c = await cookies();
+  return c.get(COOKIE_REFRESH)?.value ?? null;
+}
+
+/** Call backend refresh endpoint directly. Returns new tokens or null. Does not set cookies. */
+export async function refreshAccessToken(): Promise<{
+  accessToken: string;
+  refreshToken: string;
+} | null> {
+  const refreshToken = await getRefreshToken();
+  if (!refreshToken) return null;
+  try {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    const json = (await res.json()) as ApiResponse<AuthResponse>;
+    if (!res.ok || !json.data) return null;
+    return {
+      accessToken: json.data.accessToken,
+      refreshToken: json.data.refreshToken,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function getRedirectPath(): Promise<string> {
+  try {
+    const h = await headers();
+    const url = h.get('x-url') ?? h.get('x-invoke-path') ?? h.get('referer');
+    if (url) {
+      try {
+        const path = new URL(url).pathname;
+        if (path.startsWith('/') && path !== '/api/auth/refresh') return path;
+      } catch {
+        /* ignore */
+      }
+    }
+  } catch {
+    /* headers() may throw in some contexts */
+  }
+  return '/dashboard';
+}
+
 export async function serverFetch<T>(
   path: string,
   init?: RequestInit,
-  tokenOverride?: string | null
+  tokenOverride?: string | null,
+  options?: { skipRefreshRedirect?: boolean }
 ): Promise<ApiResponse<T>> {
   const token = tokenOverride ?? (await getAccessToken());
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
-  const headers: HeadersInit = {
+  const headersInit: HeadersInit = {
     'Content-Type': 'application/json',
     ...(init?.headers ?? {}),
   };
   if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    (headersInit as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
   const res = await fetch(url, {
     ...init,
-    headers,
+    headers: headersInit,
     cache: 'no-store',
   });
-  const json = await res.json();
+  const json = (await res.json()) as ApiResponse<unknown>;
   if (!res.ok) {
-    throw new Error((json as ApiResponse<unknown>).message ?? 'Request failed');
+    const message = (json as ApiResponse<unknown>).message ?? 'Request failed';
+    const isAuthError =
+      res.status === 401 &&
+      typeof message === 'string' &&
+      /invalid|expired|token|unauthorized/i.test(message);
+    if (isAuthError && !options?.skipRefreshRedirect) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        const retryRes = await fetch(url, {
+          ...init,
+          headers: {
+            ...headersInit,
+            Authorization: `Bearer ${refreshed.accessToken}`,
+          },
+          cache: 'no-store',
+        });
+        const retryJson = (await retryRes.json()) as ApiResponse<unknown>;
+        if (retryRes.ok) return retryJson as ApiResponse<T>;
+      }
+      const hasRefresh = await getRefreshToken();
+      if (hasRefresh) {
+        redirect(`/api/auth/refresh?redirect=${encodeURIComponent(await getRedirectPath())}`);
+      }
+      redirect('/auth/login');
+    }
+    throw new Error(String(message));
   }
   return json as ApiResponse<T>;
 }
@@ -49,7 +123,8 @@ export const getSession = cache(async (): Promise<{ user: User; accessToken: str
     const user = res.data;
     if (!user) return null;
     return { user, accessToken: token };
-  } catch {
+  } catch (err) {
+    unstable_rethrow(err);
     return null;
   }
 });

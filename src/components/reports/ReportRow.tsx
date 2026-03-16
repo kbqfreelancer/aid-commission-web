@@ -4,17 +4,28 @@ import { motion } from 'motion/react';
 import { Eye, Pencil, Trash2, CheckCircle2, XCircle, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/index';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatDate, quarterLabel } from '@/lib/utils';
 import type { HrReport, Organisation, User, ReportStatus } from '@/types';
 import { useAuthStore } from '@/stores/auth.store';
 import { useDeleteReport, useUpdateStatus } from '@/hooks/useApi';
 
-export function StatusBadge({ status }: { status: ReportStatus }) {
+export function StatusBadge({ status, light }: { status: ReportStatus; light?: boolean }) {
   const v = status as 'draft' | 'submitted' | 'verified' | 'rejected';
   const labels: Record<typeof v, string> = {
     draft: 'Draft', submitted: 'Submitted', verified: 'Verified', rejected: 'Rejected',
   };
-  return <Badge variant={v}>{labels[v]}</Badge>;
+  const lightClass: Record<typeof v, string> = {
+    draft: 'bg-gray-200 text-gray-800 border-gray-300',
+    submitted: 'bg-blue-100 text-blue-800 border-blue-200',
+    verified: 'bg-green-100 text-green-800 border-green-200',
+    rejected: 'bg-red-100 text-red-800 border-red-200',
+  };
+  return (
+    <Badge variant={v} className={light ? lightClass[v] : undefined}>
+      {labels[v]}
+    </Badge>
+  );
 }
 
 interface ReportRowProps { report: HrReport; index: number; }
@@ -36,57 +47,113 @@ export function ReportRow({ report, index }: ReportRowProps) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.25 }}
-      className="border-b border-border hover:bg-secondary/30 transition-colors group"
+      className="border-b border-gray-100 hover:bg-gray-50/80 transition-colors"
     >
-      <td className="px-4 py-3">
-        <p className="text-sm font-medium text-foreground">
+      <td className="px-6 py-3.5">
+        <p className="text-sm font-medium text-gray-900">
           {org?.name ?? '—'}
         </p>
-        <p className="text-xs text-muted-foreground font-mono">{org?.region}</p>
+        <p className="text-xs text-gray-500 font-mono">{org?.region}</p>
       </td>
-      <td className="px-4 py-3 font-mono text-sm text-foreground">
+      <td className="px-6 py-3.5 text-sm text-gray-900">
         {report.reportingYear} · {quarterLabel(report.reportingQuarter)}
       </td>
-      <td className="px-4 py-3"><StatusBadge status={report.status} /></td>
-      <td className="px-4 py-3 text-xs text-muted-foreground">
+      <td className="px-6 py-3.5"><StatusBadge status={report.status} /></td>
+      <td className="px-6 py-3.5 text-xs text-gray-600">
         {sub?.name ?? '—'}
       </td>
-      <td className="px-4 py-3 text-xs text-muted-foreground font-mono">
+      <td className="px-6 py-3.5 text-xs text-gray-500 font-mono">
         {formatDate(report.createdAt)}
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon-sm" asChild>
-            <Link href={`/reports/${report._id}`}><Eye size={13} /></Link>
-          </Button>
+      <td className="px-6 py-3.5 whitespace-nowrap align-middle" style={{ minWidth: 200 }}>
+        <div className="inline-flex items-center gap-0.5 rounded-xl bg-gray-50/80 p-1 shrink-0">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                asChild
+                className="h-8 w-8 rounded-lg text-sky-600 hover:text-sky-700 hover:bg-sky-50/80 transition-colors"
+              >
+                <Link href={`/reports/${report._id}`}><Eye size={16} strokeWidth={2} /></Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="font-medium">View</TooltipContent>
+          </Tooltip>
           {canEdit && (
-            <Button variant="ghost" size="icon-sm" asChild>
-              <Link href={`/reports/${report._id}/edit`}><Pencil size={13} /></Link>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  asChild
+                  className="h-8 w-8 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50/80 transition-colors"
+                >
+                  <Link href={`/reports/${report._id}/edit`}><Pencil size={16} strokeWidth={2} /></Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="font-medium">Edit</TooltipContent>
+            </Tooltip>
           )}
           {canSubmit && (
-            <Button variant="ghost" size="icon-sm" className="text-blue-400 hover:text-blue-300"
-              onClick={() => upSt.mutate({ status: 'submitted' })}>
-              <Send size={13} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="h-8 w-8 rounded-lg text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50/80 transition-colors"
+                  onClick={() => upSt.mutate({ status: 'submitted' })}
+                >
+                  <Send size={16} strokeWidth={2} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="font-medium">Submit</TooltipContent>
+            </Tooltip>
           )}
           {canVerify && (
-            <Button variant="ghost" size="icon-sm" className="text-green-400 hover:text-green-300"
-              onClick={() => upSt.mutate({ status: 'verified' })}>
-              <CheckCircle2 size={13} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="h-8 w-8 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/80 transition-colors"
+                  onClick={() => upSt.mutate({ status: 'verified' })}
+                >
+                  <CheckCircle2 size={16} strokeWidth={2} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="font-medium">Verify</TooltipContent>
+            </Tooltip>
           )}
           {canReject && (
-            <Button variant="ghost" size="icon-sm" className="text-red-400 hover:text-red-300"
-              onClick={() => upSt.mutate({ status: 'rejected' })}>
-              <XCircle size={13} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="h-8 w-8 rounded-lg text-orange-600 hover:text-orange-700 hover:bg-orange-50/80 transition-colors"
+                  onClick={() => upSt.mutate({ status: 'rejected' })}
+                >
+                  <XCircle size={16} strokeWidth={2} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="font-medium">Reject</TooltipContent>
+            </Tooltip>
           )}
           {report.status === 'draft' && (
-            <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive"
-              onClick={() => { if (confirm('Delete this draft?')) del.mutate(report._id); }}>
-              <Trash2 size={13} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="h-8 w-8 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 transition-colors"
+                  onClick={() => { if (confirm('Delete this draft?')) del.mutate(report._id); }}
+                >
+                  <Trash2 size={16} strokeWidth={2} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="font-medium">Delete</TooltipContent>
+            </Tooltip>
           )}
         </div>
       </td>
@@ -97,10 +164,10 @@ export function ReportRow({ report, index }: ReportRowProps) {
 export function ReportTableSkeleton() {
   return (
     <>{Array.from({ length: 5 }).map((_, i) => (
-      <tr key={i} className="border-b border-border">
+      <tr key={i} className="border-b border-gray-100">
         {Array.from({ length: 6 }).map((_, j) => (
-          <td key={j} className="px-4 py-3">
-            <div className="h-4 shimmer rounded w-24" />
+          <td key={j} className="px-6 py-3.5">
+            <div className="h-4 shimmer-skeleton rounded w-24" />
           </td>
         ))}
       </tr>

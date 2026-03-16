@@ -1,14 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Shield, Users, Building2, Activity, Database, Settings, UserPlus } from 'lucide-react';
 import Link from 'next/link';
-import { AppShell } from '@/components/layout/AppShell';
+import { useHeader } from '@/components/layout/HeaderContext';
+import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
 import { toast } from 'sonner';
-import type { User, Organisation, IndicatorDefinition } from '@/types';
+import type { Organisation, IndicatorDefinition } from '@/types';
 
 function CreateUserModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -162,13 +163,13 @@ export function AdminClient({
   orgs,
   reportsMeta,
   indicators,
-  serverUser,
 }: {
   orgs: Organisation[];
   reportsMeta: { total: number } | null;
   indicators: IndicatorDefinition[];
-  serverUser: User;
 }) {
+  const { setHeader, clearHeader } = useHeader();
+  const serverUser = useServerUser();
   const [createUserOpen, setCreateUserOpen] = useState(false);
   const totalReports = reportsMeta?.total ?? '—';
 
@@ -185,28 +186,30 @@ export function AdminClient({
     {
       key: 'Your Session',
       icon: Shield,
-      items: [
+      items: serverUser ? [
         { label: 'User', value: serverUser.name },
         { label: 'Email', value: serverUser.email },
         { label: 'Role', value: serverUser.role },
         { label: 'Account ID', value: serverUser._id },
-      ],
+      ] : [],
     },
   ];
 
+  useEffect(() => {
+    setHeader({
+      title: 'Admin Panel',
+      description: 'System administration and configuration',
+      actions: (
+        <Badge variant="admin" className="text-xs px-3 py-1.5">
+          <Shield size={12} /> Admin
+        </Badge>
+      ),
+    });
+    return clearHeader;
+  }, [setHeader, clearHeader]);
+
   return (
-    <AppShell
-      serverUser={serverUser}
-      title="Admin Panel"
-      description="System administration and configuration"
-      actions={
-        <div className="flex items-center gap-2">
-          <Badge variant="admin" className="text-xs">
-            <Shield size={10} /> Admin
-          </Badge>
-        </div>
-      }
-    >
+    <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <AdminStatCard
           icon={Building2}
@@ -323,6 +326,6 @@ export function AdminClient({
           onSuccess={() => setCreateUserOpen(false)}
         />
       )}
-    </AppShell>
+    </>
   );
 }

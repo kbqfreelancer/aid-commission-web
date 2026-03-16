@@ -7,6 +7,8 @@ import { useAuthStore } from '@/stores/auth.store';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
+import { useContext } from 'react';
+import { HeaderContext } from './HeaderContext';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -19,11 +21,17 @@ interface AppShellProps {
   headerClassName?: string;
 }
 
-function AppShellInner({ children, title, description, actions, serverUser, contentClassName, headerClassName }: AppShellProps) {
+function AppShellInner({ children, title: titleProp, description: descProp, actions: actionsProp, serverUser, contentClassName, headerClassName }: AppShellProps) {
   const router = useRouter();
   const { isAuthenticated, setUser } = useAuthStore();
   const { collapsed } = useSidebar();
   const hasAuth = serverUser ? true : isAuthenticated();
+
+  const headerCtx = useContext(HeaderContext);
+  const contextHeader = headerCtx?.header ?? null;
+  const title = titleProp ?? contextHeader?.title;
+  const description = descProp ?? contextHeader?.description;
+  const actions = actionsProp ?? contextHeader?.actions;
 
   useEffect(() => {
     if (serverUser) setUser(serverUser);
@@ -41,22 +49,26 @@ function AppShellInner({ children, title, description, actions, serverUser, cont
       <main className={cn('flex-1 min-h-screen flex flex-col transition-[margin] duration-200 ease-out', collapsed ? 'ml-16' : 'ml-60')}>
         {(title || actions) && (
           <header className={cn('sticky top-0 z-20 border-b border-gray-200 bg-white shadow-sm px-8 py-4 [&_h1]:text-gray-900 [&_p]:text-gray-700', headerClassName)}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
+            <div className="flex items-start justify-between gap-6">
+              <div className="min-w-0 flex-1">
                 {title && (
                   <motion.h1
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="font-display text-xl text-foreground"
+                    className="font-display text-xl text-gray-900"
                   >
                     {title}
                   </motion.h1>
                 )}
                 {description && (
-                  <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
+                  <p className="text-sm text-gray-600 mt-0.5">{description}</p>
                 )}
               </div>
-              {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
+              {actions && (
+                <div className="flex items-center gap-2 shrink-0 rounded-xl bg-gray-100 border border-gray-200 px-3 py-2">
+                  {actions}
+                </div>
+              )}
             </div>
           </header>
         )}

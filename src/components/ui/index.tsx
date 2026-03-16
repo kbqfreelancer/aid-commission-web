@@ -78,8 +78,23 @@ export const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttribute
 Label.displayName = 'Label';
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
-export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('shimmer rounded-md bg-muted', className)} {...props} />;
+export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Stagger delay in ms for sequential reveal */
+  delay?: number;
+  /** Rounded variant: default, lg (cards), xl (large cards) */
+  rounded?: 'default' | 'lg' | 'xl';
+}
+
+export function Skeleton({ className, delay = 0, rounded = 'default', style, ...props }: SkeletonProps) {
+  const roundedClass =
+    rounded === 'lg' ? 'rounded-xl' : rounded === 'xl' ? 'rounded-2xl' : 'rounded-md';
+  return (
+    <div
+      className={cn('shimmer-skeleton', roundedClass, className)}
+      style={{ animationDelay: `${delay}ms`, ...style }}
+      {...props}
+    />
+  );
 }
 
 // ─── Separator ────────────────────────────────────────────────────────────────

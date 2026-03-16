@@ -1,15 +1,17 @@
 'use client';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Users, FileText, Building2, TrendingUp, Activity, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { AppShell } from '@/components/layout/AppShell';
+import { useHeader } from '@/components/layout/HeaderContext';
+import { useServerUser } from '@/components/layout/ServerUserContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
 import { OrgComparisonChart } from '@/components/charts/OrgComparisonChart';
 import { sumNested } from '@/lib/utils';
-import type { HrReport, NationalSummary, OrgSummaryRow, IndicatorDefinition, User } from '@/types';
+import type { HrReport, NationalSummary, OrgSummaryRow, IndicatorDefinition } from '@/types';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i);
@@ -117,15 +119,15 @@ export function DashboardClient({
   initialData,
   year,
   quarter,
-  serverUser,
 }: {
   initialData: DashboardInitialData;
   year: number;
   quarter: string;
-  serverUser: User;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setHeader, clearHeader } = useHeader();
+  const serverUser = useServerUser();
 
   const { indicators, national, orgRows, reports } = initialData;
   const totalPpl = national ? sumNested(national.indicators) : 0;
@@ -137,18 +139,18 @@ export function DashboardClient({
     router.push(`/dashboard?${params.toString()}`);
   };
 
-  return (
-    <AppShell
-      serverUser={serverUser}
-      title="Dashboard"
-      description={`Welcome back, ${serverUser.name} · ${new Date().toLocaleDateString('en-GB', {
+  useEffect(() => {
+    if (!serverUser) return;
+    setHeader({
+      title: 'Dashboard',
+      description: `Welcome back, ${serverUser.name} · ${new Date().toLocaleDateString('en-GB', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-      })}`}
-      actions={
-        <div className="flex items-center gap-2">
+      })}`,
+      actions: (
+        <div className="flex items-center gap-2 flex-wrap">
           <Select
             value={year.toString()}
             onValueChange={(v) => setFilters(Number(v), quarter)}
@@ -184,8 +186,13 @@ export function DashboardClient({
             <Link href="/reports/new">+ New Report</Link>
           </Button>
         </div>
-      }
-    >
+      ),
+    });
+    return clearHeader;
+  }, [setHeader, clearHeader, serverUser, year, quarter]);
+
+  return (
+    <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-[150px]">
         <KpiCard
           label="People Reached"
@@ -320,6 +327,6 @@ export function DashboardClient({
           </div>
         </motion.div>
       </div>
-    </AppShell>
+    </>
   );
 }

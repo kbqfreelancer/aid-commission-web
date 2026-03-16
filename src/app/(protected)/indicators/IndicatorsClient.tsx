@@ -1,12 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Activity, ChevronDown, ChevronRight, Database, Grid3x3, Layers } from 'lucide-react';
-import { AppShell } from '@/components/layout/AppShell';
+import { useHeader } from '@/components/layout/HeaderContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/index';
 import { toDisplayKey } from '@/lib/utils';
-import type { BreakdownDefinition, IndicatorDefinition, User } from '@/types';
+import type { BreakdownDefinition, IndicatorDefinition } from '@/types';
 
 const BREAKDOWN_ICONS: Record<string, React.ElementType> = {
   age_only: Activity,
@@ -158,20 +158,23 @@ function IndicatorCard({
 
 export function IndicatorsClient({
   indicators,
-  serverUser,
 }: {
   indicators: IndicatorDefinition[];
-  serverUser: User;
 }) {
+  const { setHeader, clearHeader } = useHeader();
   const totalBreakdowns = indicators?.reduce((s, i) => s + i.breakdowns.length, 0) ?? 0;
   const breakdownTypes = [...new Set(indicators?.flatMap((i) => i.breakdowns.map((b) => b.type)) ?? [])];
 
+  useEffect(() => {
+    setHeader({
+      title: 'Indicator Registry',
+      description: 'Live view of all HR indicators defined in the system. Updates automatically when the registry changes.',
+    });
+    return clearHeader;
+  }, [setHeader, clearHeader]);
+
   return (
-    <AppShell
-      serverUser={serverUser}
-      title="Indicator Registry"
-      description="Live view of all HR indicators defined in the system. Updates automatically when the registry changes."
-    >
+    <>
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -239,6 +242,6 @@ export function IndicatorsClient({
           at runtime — all form fields, validation, and charts update automatically.
         </p>
       </motion.div>
-    </AppShell>
+    </>
   );
 }
