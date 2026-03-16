@@ -7,8 +7,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge, Input, Label } from '@/components/ui/index';
-import { useCreateOrg } from '@/hooks/useApi';
-import { orgApi } from '@/lib/api';
+import { useCreateOrg, useUpdateOrg, useDeactivateOrg } from '@/hooks/useApi';
 import { toast } from 'sonner';
 import type { Organisation, User } from '@/types';
 
@@ -22,6 +21,7 @@ function OrgModal({
   onSuccess: () => void;
 }) {
   const createOrg = useCreateOrg();
+  const updateOrg = useUpdateOrg();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: org?.name ?? '',
@@ -36,8 +36,7 @@ function OrgModal({
     setLoading(true);
     try {
       if (org) {
-        await orgApi.update(org._id, form);
-        toast.success('Organisation updated');
+        await updateOrg.mutateAsync({ id: org._id, data: form });
       } else {
         await createOrg.mutateAsync(form);
       }
@@ -189,6 +188,7 @@ export function OrganisationsClient({
   serverUser: User;
 }) {
   const router = useRouter();
+  const deactivateOrg = useDeactivateOrg();
   const isAdmin = serverUser?.role === 'admin';
   const [modal, setModal] = useState<'new' | Organisation | null>(null);
   const [search, setSearch] = useState('');
@@ -204,11 +204,10 @@ export function OrganisationsClient({
   const handleDeactivate = async (org: Organisation) => {
     if (!confirm(`Deactivate "${org.name}"?`)) return;
     try {
-      await orgApi.deactivate(org._id);
-      toast.success('Organisation deactivated');
+      await deactivateOrg.mutateAsync(org._id);
       router.refresh();
     } catch {
-      toast.error('Failed');
+      /* toast from mutation onError */
     }
   };
 

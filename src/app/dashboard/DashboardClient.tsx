@@ -156,12 +156,15 @@ export function DashboardClient({
               ))}
             </SelectContent>
           </Select>
-          <Select value={quarter} onValueChange={(v) => setFilters(year, v)}>
+          <Select
+            value={quarter || '__all__'}
+            onValueChange={(v) => setFilters(year, v === '__all__' ? '' : v)}
+          >
             <SelectTrigger className="w-28 h-8 text-xs">
               <SelectValue placeholder="All quarters" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All quarters</SelectItem>
+              <SelectItem value="__all__">All quarters</SelectItem>
               {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
                 <SelectItem key={q} value={q}>
                   {q}

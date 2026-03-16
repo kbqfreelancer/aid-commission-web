@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/index';
 import { DynamicIndicatorForm } from '@/components/forms/DynamicIndicatorForm';
 import { useCreateReport } from '@/hooks/useApi';
+import { updateReportStatusAction } from '@/lib/actions';
 import { toast } from 'sonner';
 import type { Organisation, IndicatorDefinition, User } from '@/types';
 
@@ -103,10 +104,9 @@ export function NewReportClient({
 
     try {
       const res = await createMutation.mutateAsync(payload);
-      const id = res.data.data?._id;
+      const id = res.data?._id;
       if (submitAfter && id) {
-        const { reportApi } = await import('@/lib/api');
-        await reportApi.updateStatus(id, 'submitted');
+        await updateReportStatusAction(id, 'submitted');
         toast.success('Report submitted for review');
       }
       router.push('/reports');
@@ -190,12 +190,15 @@ export function NewReportClient({
 
                 <div className="space-y-1.5">
                   <Label>Month (optional)</Label>
-                  <Select value={month} onValueChange={setMonth}>
+                  <Select
+                    value={month || '__none__'}
+                    onValueChange={(v) => setMonth(v === '__none__' ? '' : v)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select…" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="__none__">None</SelectItem>
                       {MONTHS.map((m, i) => (
                         <SelectItem key={i + 1} value={(i + 1).toString()}>
                           {m}

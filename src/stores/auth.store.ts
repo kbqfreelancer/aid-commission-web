@@ -33,6 +33,6 @@ export const useAuthStore = create<AuthState>()(
       },
       isAuthenticated: () => !!get().accessToken && !!get().user,
     }),
-    { name: 'pud-hr-auth', partialize: (s) => ({ user: s.user, accessToken: s.accessToken, refreshToken: s.refreshToken }) }
+    { name: 'nhidrs-auth', partialize: (s) => ({ user: s.user, accessToken: s.accessToken, refreshToken: s.refreshToken }) }
   )
 );

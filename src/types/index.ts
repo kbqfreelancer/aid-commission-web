@@ -101,6 +101,64 @@ export interface NationalSummary {
   indicators: Record<string, unknown>;
 }
 
+// ─── Query params (Swagger-aligned) ───────────────────────────────────────────
+export interface OrganisationQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  region?: string;
+  isActive?: boolean;
+}
+
+export interface IndicatorQueryParams {
+  page?: number;
+  limit?: number;
+  id?: string;
+}
+
+export interface ReportQueryParams {
+  year?: number;
+  quarter?: string;
+  organisation?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SummaryByOrgQueryParams {
+  year: number;
+  quarter?: string;
+  organisation?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SummaryQueryParams {
+  year: number;
+  quarter?: string;
+}
+
+export interface AuditLogQueryParams {
+  entityType?: string;
+  entityId?: string;
+  actorId?: string;
+  action?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+}
+
+export type AdminConfigKey =
+  | 'age-bands'
+  | 'sexes'
+  | 'violation-types'
+  | 'roles'
+  | 'quarters'
+  | 'report-statuses'
+  | 'status-transitions'
+  | 'required-current-status';
+
 // ─── Forms ────────────────────────────────────────────────────────────────────
 export interface LoginForm { email: string; password: string; }
 export interface RegisterForm {

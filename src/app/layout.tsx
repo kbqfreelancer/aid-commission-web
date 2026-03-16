@@ -1,16 +1,24 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from '@/components/layout/Providers';
+import { Outfit } from 'next/font/google'
+
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-outfit',
+});
 
 export const metadata: Metadata = {
-  title: { default: 'PUD HR System', template: '%s | PUD HR System' },
-  description: 'National HIV Data Collection – Human Rights Indicator Platform',
+  title: { default: 'NHIDRS', template: '%s | NHIDRS' },
+  description: 'National HIV & Human Rights Data Reporting System',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
+    <html lang="en" suppressHydrationWarning className={outfit.variable}>
+      <body className={outfit.className}>
         <Providers>{children}</Providers>
       </body>
     </html>

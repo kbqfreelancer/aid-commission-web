@@ -1,8 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,6 +17,30 @@ const schema = z.object({
 });
 type Form = z.infer<typeof schema>;
 
+const flipItems = [
+  'Track human rights indicators across facilities',
+  'Collect and report national HIV data',
+  'Monitor compliance with age, sex, and violation breakdowns',
+  'Support supervisors and data entry officers',
+];
+
+const FLIP_INTERVAL_MS = 4000;
+
+function LoginFlipItem({ text }: { text: string }) {
+  return (
+    <motion.p
+      initial={{ opacity: 0, rotateX: 75, y: 10 }}
+      animate={{ opacity: 1, rotateX: 0, y: 0 }}
+      exit={{ opacity: 0, rotateX: -75, y: -10 }}
+      transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="text-sm text-foreground leading-relaxed origin-center font-medium"
+      style={{ backfaceVisibility: 'hidden' } as React.CSSProperties}
+    >
+      {text}
+    </motion.p>
+  );
+}
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,6 +48,28 @@ export function LoginForm() {
   const redirectTo = searchParams.get('redirect') ?? '/dashboard';
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [flipIndex, setFlipIndex] = useState(0);
+  const [flipProgress, setFlipProgress] = useState(0);
+
+  useEffect(() => {
+    setFlipProgress(0);
+    const start = Date.now();
+    const frame = () => {
+      const elapsed = Date.now() - start;
+      const p = Math.min(elapsed / FLIP_INTERVAL_MS, 1);
+      setFlipProgress(p);
+      if (p < 1) requestAnimationFrame(frame);
+    };
+    const raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [flipIndex]);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setFlipIndex((i) => (i + 1) % flipItems.length);
+    }, FLIP_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
 
   const {
     register,
@@ -81,8 +126,8 @@ export function LoginForm() {
               <Shield size={18} className="text-navy-950" />
             </div>
             <div>
-              <p className="font-display text-base text-foreground">PUD HR System</p>
-              <p className="text-xs font-mono text-muted-foreground">National Data Platform</p>
+              <p className="font-display text-base text-foreground">NHIDRS</p>
+              <p className="text-xs font-mono text-muted-foreground">National HIV & Human Rights Data Reporting System</p>
             </div>
           </div>
 
@@ -111,18 +156,39 @@ export function LoginForm() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="mt-8 grid grid-cols-3 gap-4"
+              className="mt-8 min-h-[100px]"
             >
-              {[
-                { label: 'Indicators', value: '4+' },
-                { label: 'Breakdowns', value: 'Dynamic' },
-                { label: 'Roles', value: '3' },
-              ].map((s) => (
-                <div key={s.label} className="border border-border/50 rounded-lg p-3">
-                  <p className="font-display text-xl text-amber-400">{s.value}</p>
-                  <p className="text-xs text-muted-foreground font-mono mt-0.5">{s.label}</p>
+              <div className="group relative overflow-hidden rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 transition-colors hover:border-amber-500/30 hover:bg-amber-500/8 [perspective:500px]">
+                <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-400/90 mb-3">
+                  What NHIDRS does
+                </p>
+                <div className="min-h-10 flex items-center">
+                  <AnimatePresence mode="wait">
+                    <LoginFlipItem key={flipIndex} text={flipItems[flipIndex]} />
+                  </AnimatePresence>
                 </div>
-              ))}
+                <div className="mt-4 flex items-center gap-1.5">
+                  {flipItems.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setFlipIndex(i)}
+                      className="h-1.5 flex-1 min-w-0 overflow-hidden rounded-full bg-border/80 transition-colors hover:bg-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:ring-offset-2 focus:ring-offset-transparent"
+                      aria-label={`Go to slide ${i + 1}`}
+                    >
+                      <motion.span
+                        className="block h-full rounded-full bg-amber-500/70"
+                        initial={false}
+                        animate={{
+                          width: i === flipIndex ? `${flipProgress * 100}%` : i < flipIndex ? '100%' : '0%',
+                        }}
+                        transition={{ duration: 0.15 }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           </div>
 
@@ -144,7 +210,7 @@ export function LoginForm() {
             <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <Shield size={16} className="text-navy-950" />
             </div>
-            <p className="font-display text-lg text-foreground">PUD HR System</p>
+            <p className="font-display text-lg text-foreground">NHIDRS</p>
           </div>
 
           <div className="mb-8">
@@ -215,15 +281,6 @@ export function LoginForm() {
             ))}
           </div>
 
-          <p className="text-xs text-center text-muted-foreground mt-6">
-            No account?{' '}
-            <Link
-              href="/auth/register"
-              className="text-amber-400 hover:text-amber-300 transition-colors"
-            >
-              Register
-            </Link>
-          </p>
         </motion.div>
       </div>
     </div>

@@ -10,6 +10,8 @@ import type {
   HrReport,
   OrgSummaryRow,
   NationalSummary,
+  OrganisationQueryParams,
+  IndicatorQueryParams,
 } from '@/types';
 
 const qs = (params: Record<string, string | number | undefined>) => {
@@ -17,13 +19,15 @@ const qs = (params: Record<string, string | number | undefined>) => {
   return entries.length ? '?' + new URLSearchParams(entries.map(([k, v]) => [k, String(v)])).toString() : '';
 };
 
-export const getIndicators = cache(async (): Promise<IndicatorDefinition[]> => {
-  const res = await serverFetch<IndicatorDefinition[]>('/indicators');
+export const getIndicators = cache(async (params?: IndicatorQueryParams): Promise<IndicatorDefinition[]> => {
+  const q = params ? qs(params as Record<string, string | number | undefined>) : '';
+  const res = await serverFetch<IndicatorDefinition[]>(`/indicators${q}`);
   return res.data ?? [];
 });
 
-export const getOrganisations = cache(async (): Promise<Organisation[]> => {
-  const res = await serverFetch<Organisation[]>('/organisations');
+export const getOrganisations = cache(async (params?: OrganisationQueryParams): Promise<Organisation[]> => {
+  const q = params ? qs(params as Record<string, string | number | undefined>) : '';
+  const res = await serverFetch<Organisation[]>(`/organisations${q}`);
   return res.data ?? [];
 });
 
@@ -69,9 +73,18 @@ export const getNationalSummary = cache(async (year: number, quarter?: string) =
   return res.data ?? null;
 });
 
-export const getOrgSummary = cache(async (year: number, quarter?: string, organisation?: string) => {
-  const res = await serverFetch<OrgSummaryRow[]>(
-    `/reports/summary/by-organisation${qs({ year, quarter, organisation })}`
-  );
-  return res.data ?? [];
-});
+export const getOrgSummary = cache(
+  async (
+    year: number,
+    quarter?: string,
+    organisation?: string,
+    page?: number,
+    limit?: number
+  ): Promise<OrgSummaryRow[]> => {
+    const params = { year, quarter, organisation, page, limit };
+    const res = await serverFetch<OrgSummaryRow[]>(
+      `/reports/summary/by-organisation${qs(params as Record<string, string | number | undefined>)}`
+    );
+    return res.data ?? [];
+  }
+);

@@ -99,7 +99,7 @@ export function RegisterForm() {
           <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
             <Shield size={16} className="text-navy-950" />
           </div>
-          <p className="font-display text-lg text-foreground">PUD HR System</p>
+          <p className="font-display text-lg text-foreground">NHIDRS</p>
         </div>
 
         <h1 className="font-display text-2xl text-foreground mb-1">Create account</h1>
