@@ -1,8 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
-import { Activity, ChevronDown, ChevronRight, Database, Grid3x3, Layers, Search, X } from 'lucide-react';
+import { Activity, ChevronDown, ChevronRight, Database, Grid3x3, Layers, Plus, Search, X } from 'lucide-react';
 import { useHeader } from '@/components/layout/HeaderContext';
+import { useServerUser } from '@/components/layout/ServerUserContext';
+import { HEADER_PRIMARY_CLASS } from '@/components/layout/headerStyles';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { KpiCard } from '@/components/ui/KpiCard';
 import { Badge, Input } from '@/components/ui/index';
@@ -163,6 +167,8 @@ export function IndicatorsClient({
   indicators: IndicatorDefinition[];
 }) {
   const { setHeader, clearHeader } = useHeader();
+  const serverUser = useServerUser();
+  const isAdmin = serverUser?.role === 'admin';
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
 
@@ -173,9 +179,16 @@ export function IndicatorsClient({
     setHeader({
       title: 'Indicator Registry',
       description: 'Live view of all HR indicators defined in the system. Updates automatically when the registry changes.',
+      actions: isAdmin ? (
+        <Button size="sm" asChild className={HEADER_PRIMARY_CLASS}>
+          <Link href="/indicators/new">
+            <Plus size={14} /> Add indicator
+          </Link>
+        </Button>
+      ) : undefined,
     });
     return clearHeader;
-  }, [setHeader, clearHeader]);
+  }, [setHeader, clearHeader, isAdmin]);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
