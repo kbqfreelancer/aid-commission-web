@@ -319,7 +319,7 @@ export function IndicatorsClient({
       )}
 
       {/* Developer note - Reports card style */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -341,7 +341,7 @@ export function IndicatorsClient({
             at runtime — all form fields, validation, and charts update automatically.
           </p>
         </div>
-      </motion.div>
+      </motion.div> */}
     </>
   );
 }

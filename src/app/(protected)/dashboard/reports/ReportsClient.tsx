@@ -182,13 +182,13 @@ export function ReportsClient({
 
         {(hasFilters || search) && (
           <Button
-            variant="ghost"
+            variant="destructive"
             size="sm"
             onClick={() => {
               setSearch('');
               resetFilters();
             }}
-            className="text-xs h-8 text-muted-foreground"
+            className="text-xs h-8 text-white"
           >
             <Filter size={12} /> Clear
           </Button>
@@ -213,7 +213,7 @@ export function ReportsClient({
           </p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] table-auto">
+          <table className="w-full min-w-225 table-auto">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50/80">
                 {['Organisation', 'Period', 'Status', 'Submitted by', 'Created', 'Actions'].map(
@@ -242,7 +242,7 @@ export function ReportsClient({
                       </div>
                       <p className="text-sm font-semibold text-gray-700 dark:text-foreground">No reports found</p>
                       <p className="text-xs text-gray-500 dark:text-muted-foreground">Try adjusting your filters or create a new report</p>
-                      <Button variant="outline" size="sm" className="mt-1 rounded-lg" asChild>
+                      <Button variant={'secondary'} size="sm" className="mt-1 rounded-lg" asChild>
                         <Link href={ROUTES.reportsNew}>Create first report</Link>
                       </Button>
                     </div>

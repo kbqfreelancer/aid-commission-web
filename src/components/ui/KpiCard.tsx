@@ -64,8 +64,8 @@ export function KpiCard({
                 <Icon size={20} strokeWidth={2} />
               </div>
               {manageHref && (
-                <Button variant="ghost" size="sm" asChild className={`text-xs h-7 -mr-1 border-b-2 ${a.border}`}>
-                  <Link href={manageHref}>Manage →</Link>
+                <Button variant="outline" size="sm" asChild className={`text-xs h-7 -mr-1 border-b-2 ${a.border}`}>
+                  <Link className='text-green-800' href={manageHref}>Manage →</Link>
                 </Button>
               )}
             </div>
