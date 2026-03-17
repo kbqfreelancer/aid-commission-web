@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input, Label } from '@/components/ui/index';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from 'sonner';
+import { Logo } from '@/components/ui/logo';
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
@@ -121,10 +122,8 @@ export function LoginForm() {
         <div className="absolute bottom-1/3 left-8 right-8 h-px bg-linear-to-r from-transparent via-brand-gold/15 to-transparent" />
 
         <div className="relative z-10 flex flex-col justify-between h-full p-14">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-brand-gold rounded-lg flex items-center justify-center">
-              <Shield size={18} className="text-brand-black" />
-            </div>
+          <div className="flex items-center">
+            <Logo />
             <div>
               <p className="font-display text-base text-foreground">NHIDRS</p>
               <p className="text-xs font-mono text-muted-foreground">National HIV & Human Rights Data Reporting System</p>
@@ -158,7 +157,7 @@ export function LoginForm() {
               transition={{ delay: 0.5 }}
               className="mt-8 min-h-[100px]"
             >
-              <div className="group relative overflow-hidden rounded-xl border border-brand-gold/25 bg-brand-gold/5 p-5 transition-colors hover:border-brand-gold/35 hover:bg-brand-gold/8 [perspective:500px]">
+              <div className="group relative overflow-hidden rounded-xl border border-brand-gold/25 bg-brand-gold/5 p-5 transition-colors hover:border-brand-gold/35 hover:bg-brand-gold/8 perspective-normal">
                 <div className="absolute inset-0 bg-linear-to-br from-brand-gold/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 <p className="text-[10px] font-mono uppercase tracking-widest text-brand-gold/90 mb-3">
                   What NHIDRS does
@@ -193,7 +192,7 @@ export function LoginForm() {
           </div>
 
           <p className="text-[10px] font-mono text-muted-foreground/60">
-            © {new Date().getFullYear()} National HIV Programme · Confidential
+            © {new Date().getFullYear()} National HIV Programme
           </p>
         </div>
       </div>
