@@ -175,7 +175,7 @@ export function AdminClient({
 
   return (
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-[120px]">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-30">
         <KpiCard
           icon={Building2}
           label="Organisations"
@@ -190,7 +190,7 @@ export function AdminClient({
           label="Total Reports"
           value={totalReports}
           sub="All reports in the system"
-          manageHref="/reports"
+          manageHref={ROUTES.reports}
           delay={0.05}
           accentKey="gold"
         />
@@ -208,7 +208,7 @@ export function AdminClient({
           label="Pending"
           value="—"
           sub="Submitted awaiting review"
-          manageHref="/reports"
+          manageHref={ROUTES.reports}
           delay={0.15}
           accentKey="violet"
         />

@@ -7,9 +7,9 @@ import { Skeleton } from '@/components/ui/index';
 function AdminSkeleton() {
   return (
     <PageSkeleton>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-[120px]">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8 items-stretch min-h-30">
         {[0, 50, 100, 150].map((delay, i) => (
-          <SkeletonCard key={i} delay={delay} className="h-full min-h-[120px]" />
+          <SkeletonCard key={i} delay={delay} className="h-full min-h-30" />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -26,18 +26,31 @@ async function doRefresh(): Promise<{
 
 /** GET: Used when redirecting from serverFetch after 401. Reads cookies, refreshes, sets new cookies, redirects back. */
 export async function GET(request: NextRequest) {
-  const result = await doRefresh();
+  const attempt = Number(request.nextUrl.searchParams.get('attempt') ?? '1');
   const redirectTo =
     request.nextUrl.searchParams.get('redirect') ||
     request.headers.get('referer')?.replace(/^https?:\/\/[^/]+/, '') ||
     '/dashboard';
-  const cleanRedirect = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
+  const cleanRedirect =
+    redirectTo.startsWith('/') && !redirectTo.startsWith('/api/auth/refresh')
+      ? redirectTo
+      : '/dashboard';
+
+  if (!Number.isFinite(attempt) || attempt > 1) {
+    const response = NextResponse.redirect(new URL('/auth/login', request.url));
+    response.cookies.delete(cookieNames.access);
+    response.cookies.delete(cookieNames.refresh);
+    return response;
+  }
+
+  const result = await doRefresh();
   if (!result) {
     const response = NextResponse.redirect(new URL('/auth/login', request.url));
     response.cookies.delete(cookieNames.access);
     response.cookies.delete(cookieNames.refresh);
     return response;
   }
+
   const response = NextResponse.redirect(new URL(cleanRedirect, request.url));
   response.cookies.set(cookieNames.access, result.accessToken, {
     httpOnly: true,
