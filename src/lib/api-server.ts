@@ -138,22 +138,11 @@ export async function serverFetch<T>(
       typeof message === 'string' &&
       /invalid|expired|token|unauthorized/i.test(message);
     if (isAuthError && !options?.skipRefreshRedirect) {
-      const refreshed = await refreshAccessToken();
-      if (refreshed) {
-        const retryRes = await fetch(url, {
-          ...init,
-          headers: {
-            ...headersInit,
-            Authorization: `Bearer ${refreshed.accessToken}`,
-          },
-          cache: 'no-store',
-        });
-        const retryJson = (await retryRes.json()) as ApiResponse<unknown>;
-        if (retryRes.ok) return retryJson as ApiResponse<T>;
-      }
       const hasRefresh = await getRefreshToken();
       if (hasRefresh) {
-        redirect(`/api/auth/refresh?redirect=${encodeURIComponent(await getRedirectPath())}`);
+        redirect(
+          `/api/auth/refresh?attempt=1&redirect=${encodeURIComponent(await getRedirectPath())}`
+        );
       }
       redirect('/auth/login');
     }

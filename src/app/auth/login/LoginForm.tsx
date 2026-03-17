@@ -95,8 +95,8 @@ export function LoginForm() {
         toast.error(msg);
         return;
       }
-      const { user, accessToken, refreshToken } = json.data;
-      setAuth(user, accessToken, refreshToken);
+      const { user } = json.data;
+      setAuth(user);
       toast.success(`Welcome back, ${user.name}`);
       router.replace(redirectTo);
     } catch {

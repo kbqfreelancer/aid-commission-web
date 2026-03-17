@@ -5,9 +5,7 @@ import type { User } from '@/types';
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  setAuth: (user: User) => void;
   setUser: (user: User) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
@@ -16,23 +14,17 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user:         null,
-      accessToken:  null,
-      refreshToken: null,
-      setAuth: (user, accessToken, refreshToken) => {
-        localStorage.setItem('accessToken',  accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        set({ user, accessToken, refreshToken });
+      user: null,
+      setAuth: (user) => {
+        set({ user });
       },
       setUser: (user) => set({ user }),
       logout: () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        set({ user: null, accessToken: null, refreshToken: null });
+        set({ user: null });
         fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
       },
-      isAuthenticated: () => !!get().accessToken && !!get().user,
+      isAuthenticated: () => !!get().user,
     }),
-    { name: 'nhidrs-auth', partialize: (s) => ({ user: s.user, accessToken: s.accessToken, refreshToken: s.refreshToken }) }
+    { name: 'nhidrs-auth', partialize: (s) => ({ user: s.user }) }
   )
 );
