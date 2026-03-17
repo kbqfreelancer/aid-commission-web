@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { API_BASE } from '@/config/api';
 import { cookieNames } from '@/lib/api-server';
-import type { ApiResponse, AuthResponse, User } from '@/types';
+import type { ApiResponse, RefreshTokenResponse } from '@/types';
 
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 async function doRefresh(): Promise<{
   accessToken: string;
   refreshToken: string;
-  user: User;
 } | null> {
   const c = await cookies();
   const refreshToken = c.get(cookieNames.refresh)?.value;
@@ -19,9 +18,12 @@ async function doRefresh(): Promise<{
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refreshToken }),
   });
-  const json = (await res.json()) as ApiResponse<AuthResponse>;
-  if (!res.ok || !json.data) return null;
-  return json.data;
+  const json = (await res.json()) as ApiResponse<RefreshTokenResponse>;
+  if (!res.ok || !json.data?.accessToken || !json.data?.refreshToken) return null;
+  return {
+    accessToken: json.data.accessToken,
+    refreshToken: json.data.refreshToken,
+  };
 }
 
 /** GET: Used when redirecting from serverFetch after 401. Reads cookies, refreshes, sets new cookies, redirects back. */
@@ -88,7 +90,7 @@ export async function POST() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
     });
-    const json = (await res.json()) as ApiResponse<AuthResponse>;
+    const json = (await res.json()) as ApiResponse<RefreshTokenResponse>;
     if (!res.ok) {
       const response = NextResponse.json(json, { status: res.status });
       response.cookies.delete(cookieNames.access);
@@ -96,10 +98,21 @@ export async function POST() {
       return response;
     }
 
-    const { user, accessToken: newAccessToken, refreshToken: newRefreshToken } = json.data!;
+    const data = json.data;
+    if (!data?.accessToken || !data?.refreshToken) {
+      const response = NextResponse.json(
+        { success: false, message: 'Invalid refresh response shape' },
+        { status: 502 }
+      );
+      response.cookies.delete(cookieNames.access);
+      response.cookies.delete(cookieNames.refresh);
+      return response;
+    }
+
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = data;
     const response = NextResponse.json({
       success: true,
-      data: { user, accessToken: newAccessToken, refreshToken: newRefreshToken },
+      data: { accessToken: newAccessToken, refreshToken: newRefreshToken },
     });
     response.cookies.set(cookieNames.access, newAccessToken, {
       httpOnly: true,

@@ -18,6 +18,11 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
 // ─── Organisation ─────────────────────────────────────────────────────────────
 export interface Organisation {
   _id: string;

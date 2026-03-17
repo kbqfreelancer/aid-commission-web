@@ -6,7 +6,7 @@ import { cookies, headers } from 'next/headers';
 import { redirect, unstable_rethrow } from 'next/navigation';
 import { cache } from 'react';
 import { API_BASE } from '@/config/api';
-import type { ApiResponse, AuthResponse, User } from '@/types';
+import type { ApiResponse, RefreshTokenResponse, User } from '@/types';
 
 const COOKIE_ACCESS = 'pud_access_token';
 const COOKIE_REFRESH = 'pud_refresh_token';
@@ -34,8 +34,8 @@ export async function refreshAccessToken(): Promise<{
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
     });
-    const json = (await res.json()) as ApiResponse<AuthResponse>;
-    if (!res.ok || !json.data) return null;
+    const json = (await res.json()) as ApiResponse<RefreshTokenResponse>;
+    if (!res.ok || !json.data?.accessToken || !json.data?.refreshToken) return null;
     return {
       accessToken: json.data.accessToken,
       refreshToken: json.data.refreshToken,
