@@ -23,6 +23,7 @@ import { Separator } from '@/components/ui/index';
 import { StatusBadge } from '@/components/reports/ReportRow';
 import { BreakdownChart } from '@/components/charts/BreakdownChart';
 import { useUpdateStatus } from '@/hooks/useApi';
+import { ROUTES } from '@/lib/routes';
 import { formatDateTime, quarterLabel, sumNested } from '@/lib/utils';
 import type {
   HrReport,
@@ -54,13 +55,13 @@ function ReportHeaderActions({
   return (
     <div className="flex items-center gap-2">
       <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
-        <Link href="/reports">
+        <Link href={ROUTES.reports}>
           <ArrowLeft size={13} /> Back
         </Link>
       </Button>
       {canEdit && (
         <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
-          <Link href={`/reports/${id}/edit`}>
+          <Link href={ROUTES.reportEdit(id)}>
             <Pencil size={13} /> Edit
           </Link>
         </Button>

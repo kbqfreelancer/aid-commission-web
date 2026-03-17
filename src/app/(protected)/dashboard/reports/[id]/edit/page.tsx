@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { getReport, getIndicators, getOrganisations } from '@/lib/data';
-import { ReportEditClient } from '@/app/(protected)/reports/[id]/edit/ReportEditClient';
+import { ReportEditClient } from '@/app/(protected)/dashboard/reports/[id]/edit/ReportEditClient';
 import { ReportNotFoundClient } from '../ReportNotFoundClient';
 import { PageSkeleton } from '@/components/ui/PageSkeleton';
 import { Skeleton } from '@/components/ui/index';

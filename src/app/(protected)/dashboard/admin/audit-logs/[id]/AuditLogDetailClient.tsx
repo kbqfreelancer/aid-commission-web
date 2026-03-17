@@ -13,6 +13,7 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { ROUTES } from '@/lib/routes';
 import { useHeader } from '@/components/layout/HeaderContext';
 import { HEADER_BACK_CLASS } from '@/components/layout/headerStyles';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,7 @@ export function AuditLogDetailClient({ id }: { id: string }) {
       description: entry ? `${entry.action} · ${entry.entityType}` : 'Loading…',
       actions: (
         <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
-          <Link href="/admin/audit-logs">
+          <Link href={ROUTES.auditLogs}>
             <ArrowLeft size={13} /> Back
           </Link>
         </Button>
@@ -77,7 +78,7 @@ export function AuditLogDetailClient({ id }: { id: string }) {
             </p>
           </div>
           <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
-            <Link href="/admin/audit-logs">Back to Audit Trails</Link>
+            <Link href={ROUTES.auditLogs}>Back to Audit Trails</Link>
           </Button>
         </div>
       </div>

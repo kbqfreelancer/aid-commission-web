@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Search, Filter, Plus, ChevronLeft, ChevronRight, FileText, X } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { useHeader } from '@/components/layout/HeaderContext';
 import { HEADER_PRIMARY_CLASS } from '@/components/layout/headerStyles';
@@ -52,17 +53,17 @@ export function ReportsClient({
       else params.delete(k);
     });
     params.set('page', '1');
-    router.push(`/reports?${params.toString()}`);
+    router.push(`${ROUTES.reports}?${params.toString()}`);
   };
 
   const setPage = (p: number) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', String(p));
-    router.push(`/reports?${params.toString()}`);
+    router.push(`${ROUTES.reports}?${params.toString()}`);
   };
 
   const resetFilters = () => {
-    router.push('/reports');
+    router.push(ROUTES.reports);
   };
 
   const hasFilters = orgId || year || quarter || status || search;
@@ -73,7 +74,7 @@ export function ReportsClient({
       description: 'Manage and track HR indicator report submissions',
       actions: (
         <Button size="sm" asChild className={HEADER_PRIMARY_CLASS}>
-          <Link href="/reports/new">
+          <Link href={ROUTES.reportsNew}>
             <Plus size={14} /> New Report
           </Link>
         </Button>
@@ -242,7 +243,7 @@ export function ReportsClient({
                       <p className="text-sm font-semibold text-gray-700 dark:text-foreground">No reports found</p>
                       <p className="text-xs text-gray-500 dark:text-muted-foreground">Try adjusting your filters or create a new report</p>
                       <Button variant="outline" size="sm" className="mt-1 rounded-lg" asChild>
-                        <Link href="/reports/new">Create first report</Link>
+                        <Link href={ROUTES.reportsNew}>Create first report</Link>
                       </Button>
                     </div>
                   </td>

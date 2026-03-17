@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { KpiCard } from '@/components/ui/KpiCard';
 import { Badge, Input } from '@/components/ui/index';
+import { ROUTES } from '@/lib/routes';
 import { toDisplayKey } from '@/lib/utils';
 import type { BreakdownDefinition, IndicatorDefinition } from '@/types';
 
@@ -181,7 +182,7 @@ export function IndicatorsClient({
       description: 'Live view of all HR indicators defined in the system. Updates automatically when the registry changes.',
       actions: isAdmin ? (
         <Button size="sm" asChild className={HEADER_PRIMARY_CLASS}>
-          <Link href="/indicators/new">
+          <Link href={ROUTES.indicatorsNew}>
             <Plus size={14} /> Add indicator
           </Link>
         </Button>

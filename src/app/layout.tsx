@@ -11,8 +11,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: { default: 'NHIDRS', template: '%s | NHIDRS' },
-  description: 'National HIV & Human Rights Data Reporting System',
+  title: { default: 'NHIDRS (National HIV & Human Rights Data Reporting System)', template: '%s | NHIDRS (National HIV & Human Rights Data Reporting System)' },
+  description: 'National HIV & Human Rights Data Reporting System: Tracking human rights indicators across state agencies and health facilities.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

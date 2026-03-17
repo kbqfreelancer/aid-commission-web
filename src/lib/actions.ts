@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { serverFetch } from '@/lib/api-server';
 import type {
   Organisation,
@@ -57,6 +58,10 @@ export async function createOrganisationAction(data: Partial<Organisation>): Pro
     method: 'POST',
     body: JSON.stringify(data),
   });
+  revalidatePath('/dashboard/organisations', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -68,6 +73,10 @@ export async function updateOrganisationAction(
     method: 'PATCH',
     body: JSON.stringify(data),
   });
+  revalidatePath('/dashboard/organisations', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -75,6 +84,10 @@ export async function deactivateOrganisationAction(id: string): Promise<ApiRespo
   const res = await serverFetch<void>(`/organisations/${id}`, {
     method: 'DELETE',
   });
+  revalidatePath('/dashboard/organisations', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -97,6 +110,9 @@ export async function createReportAction(data: unknown): Promise<ApiResponse<HrR
     method: 'POST',
     body: JSON.stringify(data),
   });
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -105,6 +121,9 @@ export async function updateReportAction(id: string, data: unknown): Promise<Api
     method: 'PATCH',
     body: JSON.stringify(data),
   });
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -117,6 +136,9 @@ export async function updateReportStatusAction(
     method: 'PATCH',
     body: JSON.stringify({ status, notes }),
   });
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -124,6 +146,9 @@ export async function deleteReportAction(id: string): Promise<ApiResponse<void>>
   const res = await serverFetch<void>(`/reports/${id}`, {
     method: 'DELETE',
   });
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -165,6 +190,7 @@ export async function updateAdminConfigKeyAction(
     method: 'PUT',
     body: JSON.stringify(value),
   });
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -186,6 +212,10 @@ export async function createAdminIndicatorAction(data: {
     method: 'POST',
     body: JSON.stringify(data),
   });
+  revalidatePath('/dashboard/indicators', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/reports', 'layout');
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }
 
@@ -208,5 +238,6 @@ export async function createUserAction(data: {
     method: 'POST',
     body: JSON.stringify(data),
   });
+  revalidatePath('/dashboard/admin', 'layout');
   return res;
 }

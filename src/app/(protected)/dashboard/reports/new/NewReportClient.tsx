@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/index';
 import { DynamicIndicatorForm } from '@/components/forms/DynamicIndicatorForm';
 import { useCreateReport } from '@/hooks/useApi';
+import { ROUTES } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { updateReportStatusAction } from '@/lib/actions';
 import { toast } from 'sonner';
@@ -124,7 +125,7 @@ export function NewReportClient({
         await updateReportStatusAction(id, 'submitted');
         toast.success('Report submitted for review');
       }
-      router.push('/reports');
+      router.push(ROUTES.reports);
     } catch {
       /* error handled by mutation hook */
     } finally {
@@ -311,7 +312,7 @@ export function NewReportClient({
                     <p className="text-sm font-semibold text-foreground">Could not load indicator registry</p>
                     <p className="text-xs text-muted-foreground text-center">Check your connection and try again.</p>
                     <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
-                      <Link href="/reports">Back to reports</Link>
+                      <Link href={ROUTES.reports}>Back to reports</Link>
                     </Button>
                   </div>
                 )}

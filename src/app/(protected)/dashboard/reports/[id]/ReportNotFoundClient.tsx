@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { useHeader } from '@/components/layout/HeaderContext';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +20,7 @@ export function ReportNotFoundClient() {
         This report does not exist or you don&apos;t have access.
       </p>
       <Button variant="outline" asChild>
-        <Link href="/reports">← Back to reports</Link>
+        <Link href={ROUTES.reports}>← Back to reports</Link>
       </Button>
     </div>
   );

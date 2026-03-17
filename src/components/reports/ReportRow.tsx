@@ -1,11 +1,11 @@
 'use client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Eye, Pencil, Trash2, CheckCircle2, XCircle, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/index';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ROUTES } from '@/lib/routes';
 import { formatDate, quarterLabel } from '@/lib/utils';
 import type { HrReport, Organisation, User, ReportStatus } from '@/types';
 import { useAuthStore } from '@/stores/auth.store';
@@ -33,7 +33,6 @@ export function StatusBadge({ status, light }: { status: ReportStatus; light?: b
 interface ReportRowProps { report: HrReport; index: number; }
 
 export function ReportRow({ report, index }: ReportRowProps) {
-  const router = useRouter();
   const { user } = useAuthStore();
   const org  = report.organisation as Organisation;
   const sub  = report.submittedBy as User;
@@ -56,7 +55,6 @@ export function ReportRow({ report, index }: ReportRowProps) {
         onClick: async () => {
           try {
             await del.mutateAsync(report._id);
-            router.refresh();
           } catch {
             toast.error('Failed to delete report. Please try again.');
           }
@@ -107,7 +105,7 @@ export function ReportRow({ report, index }: ReportRowProps) {
                 asChild
                 className="h-8 w-8 rounded-lg text-sky-600 hover:text-sky-700 hover:bg-sky-50/80 transition-colors"
               >
-                <Link href={`/reports/${report._id}`}><Eye size={16} strokeWidth={2} /></Link>
+                <Link href={`/dashboard/reports/${report._id}`}><Eye size={16} strokeWidth={2} /></Link>
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top" className="font-medium">View</TooltipContent>
@@ -121,7 +119,7 @@ export function ReportRow({ report, index }: ReportRowProps) {
                   asChild
                   className="h-8 w-8 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50/80 transition-colors"
                 >
-                  <Link href={`/reports/${report._id}/edit`}><Pencil size={16} strokeWidth={2} /></Link>
+                  <Link href={ROUTES.reportEdit(report._id)}><Pencil size={16} strokeWidth={2} /></Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top" className="font-medium">Edit</TooltipContent>

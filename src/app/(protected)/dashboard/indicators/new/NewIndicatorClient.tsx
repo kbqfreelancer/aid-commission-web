@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input, Label } from '@/components/ui/index';
 import { BreakdownBlockEditor, type BreakdownBlock } from '@/components/indicators/BreakdownBuilder';
+import { ROUTES } from '@/lib/routes';
 import { useCreateAdminIndicator } from '@/hooks/useApi';
 import { toast } from 'sonner';
 
@@ -88,7 +89,7 @@ export function NewIndicatorClient() {
       actions: (
         <div className="flex items-center gap-2">
           <Button size="sm" asChild className={HEADER_BACK_CLASS}>
-            <Link href="/indicators">
+            <Link href={ROUTES.indicators}>
               <ArrowLeft size={14} /> Back
             </Link>
           </Button>
@@ -133,7 +134,7 @@ export function NewIndicatorClient() {
 
     try {
       await createMutation.mutateAsync(payload);
-      router.push('/indicators');
+      router.push(ROUTES.indicators);
     } catch {
       setError('Failed to create indicator');
     }
@@ -230,7 +231,7 @@ export function NewIndicatorClient() {
           <Save size={14} /> Create indicator
         </Button>
         <Button type="button" variant="ghost" asChild>
-          <Link href="/indicators">Cancel</Link>
+          <Link href={ROUTES.indicators}>Cancel</Link>
         </Button>
       </div>
     </form>

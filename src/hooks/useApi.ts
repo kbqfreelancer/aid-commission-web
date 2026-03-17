@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getIndicatorsAction,
@@ -54,27 +55,42 @@ export const useOrganisations = (params?: OrganisationQueryParams) =>
 
 export const useCreateOrg = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: (data: Partial<Organisation>) => createOrganisationAction(data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['organisations'] }); toast.success('Organisation created'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['organisations'] });
+      router.refresh();
+      toast.success('Organisation created');
+    },
     onError:   () => toast.error('Failed to create organisation'),
   });
 };
 
 export const useUpdateOrg = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Organisation> }) => updateOrganisationAction(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['organisations'] }); toast.success('Organisation updated'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['organisations'] });
+      router.refresh();
+      toast.success('Organisation updated');
+    },
     onError:   () => toast.error('Failed to update organisation'),
   });
 };
 
 export const useDeactivateOrg = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: (id: string) => deactivateOrganisationAction(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['organisations'] }); toast.success('Organisation deactivated'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['organisations'] });
+      router.refresh();
+      toast.success('Organisation deactivated');
+    },
     onError:   () => toast.error('Failed to deactivate organisation'),
   });
 };
@@ -101,29 +117,41 @@ export const useReport = (id: string) =>
 
 export const useCreateReport = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: (data: unknown) => createReportAction(data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['reports'] }); toast.success('Report saved as draft'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['reports'] });
+      router.refresh();
+      toast.success('Report saved as draft');
+    },
     onError:   () => toast.error('Failed to save report'),
   });
 };
 
 export const useUpdateReport = (id: string) => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: (data: unknown) => updateReportAction(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['reports', id] }); toast.success('Report updated'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['reports', id] });
+      router.refresh();
+      toast.success('Report updated');
+    },
     onError:   () => toast.error('Failed to update report'),
   });
 };
 
 export const useUpdateStatus = (id: string) => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: ({ status, notes }: { status: string; notes?: string }) =>
       updateReportStatusAction(id, status, notes),
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ['reports'] });
+      router.refresh();
       toast.success(`Report ${status}`);
     },
     onError: () => toast.error('Status update failed'),
@@ -132,9 +160,14 @@ export const useUpdateStatus = (id: string) => {
 
 export const useDeleteReport = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: (id: string) => deleteReportAction(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['reports'] }); toast.success('Report deleted'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['reports'] });
+      router.refresh();
+      toast.success('Report deleted');
+    },
     onError:   () => toast.error('Failed to delete report'),
   });
 };
@@ -188,12 +221,14 @@ export const useAdminConfigKey = (key: string) =>
 
 export const useUpdateAdminConfigKey = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: ({ key, value }: { key: AdminConfigKey; value: unknown }) =>
       updateAdminConfigKeyAction(key, value),
     onSuccess: (_, { key }) => {
       qc.invalidateQueries({ queryKey: ['admin', 'config'] });
       qc.invalidateQueries({ queryKey: ['admin', 'config', key] });
+      router.refresh();
       toast.success('Config updated');
     },
     onError: () => toast.error('Failed to update config'),
@@ -211,12 +246,14 @@ export const useAdminIndicators = (params?: IndicatorQueryParams) =>
 
 export const useCreateAdminIndicator = () => {
   const qc = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: (data: { id: string; number: string; label: string; breakdowns: unknown[] }) =>
       createAdminIndicatorAction(data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'indicators'] });
       qc.invalidateQueries({ queryKey: ['indicators'] });
+      router.refresh();
       toast.success('Indicator created');
     },
     onError: () => toast.error('Failed to create indicator'),

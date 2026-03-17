@@ -3,13 +3,7 @@ import type { NextRequest } from 'next/server';
 
 const COOKIE_ACCESS = 'pud_access_token';
 
-const PROTECTED_PATHS = [
-  '/dashboard',
-  '/reports',
-  '/indicators',
-  '/admin',
-  '/organisations',
-];
+const PROTECTED_PATHS = ['/dashboard'];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -28,16 +22,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/dashboard',
-    '/dashboard/:path*',
-    '/reports',
-    '/reports/:path*',
-    '/indicators',
-    '/indicators/:path*',
-    '/admin',
-    '/admin/:path*',
-    '/organisations',
-    '/organisations/:path*',
-  ],
+  matcher: ['/dashboard', '/dashboard/:path*'],
 };

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { KpiCard } from '@/components/ui/KpiCard';
 import { HEADER_PRIMARY_CLASS } from '@/components/layout/headerStyles';
 import { Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
+import { ROUTES } from '@/lib/routes';
 import { toast } from 'sonner';
 import type { Organisation, IndicatorDefinition } from '@/types';
 
@@ -180,7 +181,7 @@ export function AdminClient({
           label="Organisations"
           value={orgs?.length ?? 0}
           sub="Active reporting organisations"
-          manageHref="/organisations"
+          manageHref={ROUTES.organisations}
           delay={0}
           accentKey="primary"
         />
@@ -198,7 +199,7 @@ export function AdminClient({
           label="Indicators"
           value={indicators?.length ?? '…'}
           sub="In the dynamic registry"
-          manageHref="/indicators"
+          manageHref={ROUTES.indicators}
           delay={0.1}
           accentKey="blue"
         />
@@ -278,11 +279,11 @@ export function AdminClient({
                   </div>
                 </motion.button>
                 {[
-                  { label: 'Add Organisation', href: '/organisations', icon: Building2, desc: 'Register a facility' },
-                  { label: 'View Reports', href: '/reports', icon: Activity, desc: 'Browse submissions' },
-                  { label: 'New Report', href: '/reports/new', icon: FileText, desc: 'Create HR report' },
-                  { label: 'Indicator Registry', href: '/indicators', icon: Layers, desc: 'View definitions' },
-                  { label: 'Audit Trails', href: '/admin/audit-logs', icon: ScrollText, desc: 'View audit logs' },
+                  { label: 'Add Organisation', href: ROUTES.organisations, icon: Building2, desc: 'Register a facility' },
+                  { label: 'View Reports', href: ROUTES.reports, icon: Activity, desc: 'Browse submissions' },
+                  { label: 'New Report', href: ROUTES.reportsNew, icon: FileText, desc: 'Create HR report' },
+                  { label: 'Indicator Registry', href: ROUTES.indicators, icon: Layers, desc: 'View definitions' },
+                  { label: 'Audit Trails', href: ROUTES.auditLogs, icon: ScrollText, desc: 'View audit logs' },
                 ].map(({ label, href, icon: Icon, desc }, i) => (
                   <motion.div
                     key={label}

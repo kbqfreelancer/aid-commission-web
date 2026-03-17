@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, FileText, Building2, Settings, LogOut, ChevronLeft, ChevronRight, Shield, Activity, ScrollText,
 } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
 import { useSidebar } from './SidebarContext';
@@ -11,14 +12,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { href: '/dashboard',     label: 'Dashboard',     icon: LayoutDashboard },
-  { href: '/reports',       label: 'Reports',       icon: FileText },
-  { href: '/organisations', label: 'Organisations',  icon: Building2 },
-  { href: '/indicators',    label: 'Indicators',     icon: Activity },
+  { href: ROUTES.dashboard,     label: 'Dashboard',     icon: LayoutDashboard, exactMatch: true },
+  { href: ROUTES.reports,       label: 'Reports',       icon: FileText },
+  { href: ROUTES.organisations, label: 'Organisations', icon: Building2 },
+  { href: ROUTES.indicators,    label: 'Indicators',    icon: Activity },
 ];
 const adminItems = [
-  { href: '/admin', label: 'Admin Config', icon: Settings },
-  { href: '/admin/audit-logs', label: 'Audit Trails', icon: ScrollText },
+  { href: ROUTES.admin,      label: 'Admin Config', icon: Settings, exactMatch: true },
+  { href: ROUTES.auditLogs, label: 'Audit Trails', icon: ScrollText },
 ];
 
 export function Sidebar() {
@@ -29,8 +30,8 @@ export function Sidebar() {
 
   const handleLogout = () => { logout(); router.push('/auth/login'); };
 
-  const NavLink = ({ href, label, icon: Icon }: typeof navItems[0]) => {
-    const active = pathname === href || pathname.startsWith(href + '/');
+  const NavLink = ({ href, label, icon: Icon, exactMatch = false }: { href: string; label: string; icon: React.ElementType; exactMatch?: boolean }) => {
+    const active = exactMatch ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     const linkContent = (
       <Link href={href} className={cn(
         'group flex items-center gap-3 rounded-md text-sm font-medium transition-all duration-150',
@@ -75,8 +76,7 @@ export function Sidebar() {
           </div>
           {!collapsed && (
             <div>
-              <p className="font-display text-sm font-semibold leading-tight text-foreground">NHIDRS</p>
-              <p className="text-[10px] text-muted-foreground leading-tight font-mono">National HIV & Human Rights Data Reporting System</p>
+              <p className="font-display text-sm font-semibold leading-tight text-foreground">NHIDRS (National HIV & Human Rights Data Reporting System)</p>
             </div>
           )}
         </div>

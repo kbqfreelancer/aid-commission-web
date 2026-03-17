@@ -12,6 +12,7 @@ import { KpiCard } from '@/components/ui/KpiCard';
 import { HEADER_PRIMARY_CLASS } from '@/components/layout/headerStyles';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/index';
 import { OrgComparisonChart } from '@/components/charts/OrgComparisonChart';
+import { ROUTES } from '@/lib/routes';
 import { sumNested } from '@/lib/utils';
 import type { HrReport, NationalSummary, OrgSummaryRow, IndicatorDefinition } from '@/types';
 
@@ -87,7 +88,7 @@ export function DashboardClient({
     const params = new URLSearchParams(searchParams);
     params.set('year', String(newYear));
     params.set('quarter', newQuarter);
-    router.push(`/dashboard?${params.toString()}`);
+    router.push(`${ROUTES.dashboard}?${params.toString()}`);
   };
 
   const hasFilters = year !== new Date().getFullYear() || !!quarter;
@@ -103,7 +104,7 @@ export function DashboardClient({
       })}`,
       actions: (
         <Button size="sm" asChild className={HEADER_PRIMARY_CLASS}>
-          <Link href="/reports/new">+ New Report</Link>
+          <Link href={ROUTES.reportsNew}>+ New Report</Link>
         </Button>
       ),
     });
@@ -153,7 +154,7 @@ export function DashboardClient({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push(ROUTES.dashboard)}
             className="text-xs h-9 text-muted-foreground"
           >
             <Filter size={12} /> Clear
@@ -260,7 +261,7 @@ export function DashboardClient({
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-bold text-gray-900">Indicator Registry</CardTitle>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/indicators" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 rounded-lg px-3 py-1.5">
+                  <Link href={ROUTES.indicators} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 rounded-lg px-3 py-1.5">
                     View all →
                   </Link>
                 </Button>

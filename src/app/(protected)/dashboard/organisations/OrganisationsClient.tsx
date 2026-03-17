@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Plus, Building2, MapPin, Mail, Phone, Pencil, PowerOff, Search, X } from 'lucide-react';
 import { useHeader } from '@/components/layout/HeaderContext';
@@ -108,7 +107,6 @@ export function OrganisationsClient({
 }: {
   orgs: Organisation[];
 }) {
-  const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
   const serverUser = useServerUser();
   const deactivateOrg = useDeactivateOrg();
@@ -163,7 +161,6 @@ export function OrganisationsClient({
           try {
             await deactivateOrg.mutateAsync(org._id);
             toast.success(`"${org.name}" has been deactivated.`);
-            router.refresh();
           } catch {
             toast.error('Failed to deactivate organisation. Please try again.');
           }
@@ -176,9 +173,7 @@ export function OrganisationsClient({
     });
   };
 
-  const handleModalSuccess = () => {
-    router.refresh();
-  };
+  const handleModalSuccess = () => {};
 
   return (
     <>

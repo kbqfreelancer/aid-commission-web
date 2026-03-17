@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { API_BASE } from '@/config/api';
 import { cookieNames } from '@/lib/api-server';
@@ -28,6 +29,7 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       return NextResponse.json(json, { status: res.status });
     }
+    revalidatePath('/dashboard/admin', 'layout');
     return NextResponse.json({ success: true, data: json.data });
   } catch (err) {
     return NextResponse.json(

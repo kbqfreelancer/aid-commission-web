@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ChevronLeft, ChevronRight, ScrollText, X, Eye } from 'lucide-react';
 import { format } from 'date-fns';
+import { ROUTES } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { useHeader } from '@/components/layout/HeaderContext';
 import { useAdminAuditLogs } from '@/hooks/useApi';
@@ -46,17 +47,17 @@ export function AuditTrailsClient() {
       else next.delete(k);
     });
     next.set('page', '1');
-    router.push(`/admin/audit-logs?${next.toString()}`);
+    router.push(`${ROUTES.auditLogs}?${next.toString()}`);
   };
 
   const setPage = (p: number) => {
     const next = new URLSearchParams(searchParams);
     next.set('page', String(p));
-    router.push(`/admin/audit-logs?${next.toString()}`);
+    router.push(`${ROUTES.auditLogs}?${next.toString()}`);
   };
 
   const resetFilters = () => {
-    router.push('/admin/audit-logs');
+    router.push(ROUTES.auditLogs);
   };
 
   const hasFilters = entityType || entityId || actorId || action || fromRaw || toRaw;
@@ -308,7 +309,7 @@ export function AuditTrailsClient() {
                     </td>
                     <td className="sticky right-0 bg-white px-6 py-3 dark:bg-card group-hover:bg-gray-50/50 dark:group-hover:bg-muted/30 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.2)]">
                       <Link
-                        href={`/admin/audit-logs/${entry._id}`}
+                        href={ROUTES.auditLog(entry._id)}
                         onClick={() => handleViewLog(entry)}
                         className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-amber-600 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-500/20 dark:hover:text-amber-300"
                       >

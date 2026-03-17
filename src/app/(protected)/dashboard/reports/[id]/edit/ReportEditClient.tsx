@@ -22,6 +22,7 @@ import {
 import { DynamicIndicatorForm } from '@/components/forms/DynamicIndicatorForm';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateReport } from '@/hooks/useApi';
+import { ROUTES } from '@/lib/routes';
 import { updateReportStatusAction } from '@/lib/actions';
 import { toast } from 'sonner';
 import type { Organisation, IndicatorDefinition, HrReport } from '@/types';
@@ -136,7 +137,7 @@ export function ReportEditClient({
         queryClient.invalidateQueries({ queryKey: ['reports'] });
         toast.success('Report submitted for review');
       }
-      router.push('/reports');
+      router.push(ROUTES.reports);
     } catch {
       /* error handled by mutation hook */
     } finally {
@@ -150,7 +151,7 @@ export function ReportEditClient({
       description: 'Update HR indicator summary report',
       actions: (
         <Button variant="outline" size="sm" asChild className={HEADER_BACK_CLASS}>
-          <Link href={`/reports/${id}`}>
+          <Link href={ROUTES.report(id)}>
             <ArrowLeft size={13} /> Back
           </Link>
         </Button>
